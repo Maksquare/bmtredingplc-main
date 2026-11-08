@@ -1,26 +1,156 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* High-Contrast Luxury Architectural Brand Tokens (Inspired by FORM AT WOOD) */
+  --color-forest: #0B241B;
+  --color-forest-dark: #071711;
+  --color-forest-light: #163B2D;
+  --color-forest-surface: #0E2E23;
+
+  --color-amber-oak: #C8832A;
+  --color-amber-hover: #AF6F1E;
+  --color-amber-light: #EAA84F;
+  --color-amber-pale: #FBF4EB;
+
+  --color-charcoal: #141715;
+  --color-charcoal-light: #2D332F;
+  --color-charcoal-muted: #3D4A43;
+  --color-charcoal-subtle: #5A6961;
+
+  --color-cream: #F8F5F0;
+  --color-cream-surface: #EFEAE0;
+  --color-cream-card: #FFFFFF;
+  --color-cream-border: #D8CFC0;
+  --color-cream-dark: #E4DCCE;
+
+  --background: #F8F5F0;
+  --foreground: #141715;
+
+  --font-display: 'Cinzel', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Brand Theme Utility Classes */
+.bg-forest { background-color: var(--color-forest); }
+.bg-forest-dark { background-color: var(--color-forest-dark); }
+.bg-forest-light { background-color: var(--color-forest-light); }
+.bg-forest-surface { background-color: var(--color-forest-surface); }
+
+.bg-amber-oak { background-color: var(--color-amber-oak); }
+.bg-amber-hover { background-color: var(--color-amber-hover); }
+.bg-amber-light { background-color: var(--color-amber-light); }
+.bg-amber-pale { background-color: var(--color-amber-pale); }
+
+.bg-charcoal { background-color: var(--color-charcoal); }
+.bg-charcoal-light { background-color: var(--color-charcoal-light); }
+.bg-charcoal-muted { background-color: var(--color-charcoal-muted); }
+
+.bg-cream { background-color: var(--color-cream); }
+.bg-cream-surface { background-color: var(--color-cream-surface); }
+.bg-cream-border { background-color: var(--color-cream-border); }
+
+.text-forest { color: var(--color-forest); }
+.text-forest-dark { color: var(--color-forest-dark); }
+.text-forest-light { color: var(--color-forest-light); }
+
+.text-amber-oak { color: var(--color-amber-oak); }
+.text-amber-hover { color: var(--color-amber-hover); }
+.text-amber-light { color: var(--color-amber-light); }
+
+.text-charcoal { color: var(--color-charcoal); }
+.text-charcoal-light { color: var(--color-charcoal-light); }
+.text-charcoal-muted { color: var(--color-charcoal-muted); }
+.text-charcoal-subtle { color: var(--color-charcoal-subtle); }
+
+.text-cream { color: var(--color-cream); }
+
+.border-forest { border-color: var(--color-forest); }
+.border-forest-light { border-color: var(--color-forest-light); }
+.border-amber-oak { border-color: var(--color-amber-oak); }
+.border-cream-border { border-color: var(--color-cream-border); }
+
+.font-display { font-family: var(--font-display); }
+
+html {
+  font-family: var(--font-sans);
+  background-color: var(--color-cream);
+  color: var(--color-charcoal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Architectural woodgrain background patterns (named pattern-* so tailwind-merge never strips bg-color) */
+.pattern-timber-grain,
+.bg-timber-grain {
+  background-color: var(--color-cream);
+  background-image: radial-gradient(rgba(200, 131, 42, 0.06) 1px, transparent 1px),
+    radial-gradient(rgba(11, 36, 27, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+}
+
+.pattern-dark-grain,
+.bg-dark-grain {
+  background-color: var(--color-forest);
+  background-image: radial-gradient(rgba(200, 131, 42, 0.12) 1px, transparent 1px),
+    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-position: 0 0, 14px 14px;
+}
+
+/* Infinite Marquee for Sliding Client/Partner Companies */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 32s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Focus styles for accessibility */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-amber-oak);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EFEAE0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C8832A;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #AF6F1E;
 }
