@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { motion, useReducedMotion, Variants } from "framer-motion";
+import React, { useEffect, useRef } from "react";
+import { getGSAP, prefersReducedMotion } from "@/lib/gsap";
 
 interface RevealProps {
   children: React.ReactNode;
@@ -16,95 +16,113 @@ export function Reveal({
   children,
   variant = "fade-up",
   delay = 0,
-  duration = 0.5,
+  duration = 0.65,
   className,
-  once = true,
 }: RevealProps) {
-  const shouldReduceMotion = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
 
-  if (shouldReduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
 
-  const variants: Record<string, Variants> = {
-    "fade-up": {
-      hidden: { opacity: 0, y: 32 },
-      visible: { opacity: 1, y: 0 },
-    },
-    "fade-down": {
-      hidden: { opacity: 0, y: -32 },
-      visible: { opacity: 1, y: 0 },
-    },
-    "fade-left": {
-      hidden: { opacity: 0, x: 32 },
-      visible: { opacity: 1, x: 0 },
-    },
-    "fade-right": {
-      hidden: { opacity: 0, x: -32 },
-      visible: { opacity: 1, x: 0 },
-    },
-    "zoom-in": {
-      hidden: { opacity: 0, scale: 0.94 },
-      visible: { opacity: 1, scale: 1 },
-    },
-    fade: {
-      hidden: { opacity: 0 },
-      visible: { opacity: 1 },
-    },
-  };
+    if (prefersReducedMotion()) {
+      el.style.opacity = "1";
+      el.style.transform = "none";
+      return;
+    }
+
+    const gsap = getGSAP();
+    const ctx = gsap.context(() => {
+      let fromVars: gsap.TweenVars = { opacity: 0 };
+      if (variant === "fade-up") fromVars = { opacity: 0, y: 32 };
+      else if (variant === "fade-down") fromVars = { opacity: 0, y: -32 };
+      else if (variant === "fade-left") fromVars = { opacity: 0, x: -32 };
+      else if (variant === "fade-right") fromVars = { opacity: 0, x: 32 };
+      else if (variant === "zoom-in") fromVars = { opacity: 0, scale: 0.94, y: 16 };
+      else fromVars = { opacity: 0 };
+
+      gsap.fromTo(
+        el,
+        fromVars,
+        {
+          opacity: 1,
+          x: 0,
+          y: 0,
+          scale: 1,
+          duration,
+          delay,
+          ease: variant === "zoom-in" ? "back.out(1.4)" : "power3.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 88%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+    }, el);
+
+    return () => ctx.revert();
+  }, [variant, delay, duration]);
 
   return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once, margin: "-60px" }}
-      transition={{
-        duration,
-        delay,
-        ease: [0.21, 0.47, 0.32, 0.98],
-      }}
-      variants={variants[variant]}
-      className={className}
-    >
+    <div ref={ref} className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
 export function StaggerContainer({
   children,
-  staggerDelay = 0.12,
+  staggerDelay = 0.09,
   className,
-  once = true,
 }: {
   children: React.ReactNode;
   staggerDelay?: number;
   className?: string;
   once?: boolean;
 }) {
-  const shouldReduceMotion = useReducedMotion();
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  if (shouldReduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    if (prefersReducedMotion()) {
+      Array.from(el.children).forEach((child) => {
+        (child as HTMLElement).style.opacity = "1";
+        (child as HTMLElement).style.transform = "none";
+      });
+      return;
+    }
+
+    const gsap = getGSAP();
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el.children,
+        { opacity: 0, y: 28, scale: 0.98 },
+        {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.65,
+          stagger: staggerDelay,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: el,
+            start: "top 86%",
+            toggleActions: "play none none none",
+          },
+        }
+      );
+    }, el);
+
+    return () => ctx.revert();
+  }, [staggerDelay]);
 
   return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once, margin: "-60px" }}
-      variants={{
-        hidden: {},
-        visible: {
-          transition: {
-            staggerChildren: staggerDelay,
-          },
-        },
-      }}
-      className={className}
-    >
+    <div ref={containerRef} className={className}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -115,23 +133,5 @@ export function StaggerItem({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <motion.div
-      variants={{
-        hidden: { opacity: 0, y: 24 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: {
-            duration: 0.5,
-            ease: [0.21, 0.47, 0.32, 0.98],
-          },
-        },
-      }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }
-

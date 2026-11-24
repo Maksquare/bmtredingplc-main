@@ -29,3 +29,19 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+/**
+ * Smart route matcher for navigation links.
+ * Matches exact root "/" or sub-routes with trailing slash or query params.
+ */
+export function isRouteActive(pathname: string | null | undefined, href: string): boolean {
+  if (!pathname || !href) return false;
+  if (href === "/") {
+    return pathname === "/";
+  }
+  return (
+    pathname === href ||
+    pathname.startsWith(`${href}/`) ||
+    pathname.startsWith(`${href}?`)
+  );
+}
+

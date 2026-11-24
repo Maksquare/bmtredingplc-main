@@ -19,7 +19,7 @@ import { Container } from "@/components/ui/Container";
 import { ContactForm } from "@/components/forms/ContactForm";
 
 export const metadata: Metadata = {
-  title: "Contact Central Yard & Sales Desk • Addis Ababa, Ethiopia | bmtredingplc",
+  title: "Contact Central Yard & Sales Desk • Addis Ababa, Ethiopia | bmtradingplc",
   description: `Contact ${siteConfig.name} in Addis Ababa, Ethiopia for wholesale plywood pricing, container logistics, sample specimens, and warehouse gate collection details.`,
 };
 
@@ -138,7 +138,7 @@ export default function ContactPage() {
                   </h4>
                   <div className="grid grid-cols-2 gap-3">
                     <a
-                      href={`https://wa.me/${siteConfig.contact.whatsapp.replace(/[^0-9]/g, "")}?text=Hello%20bmtredingplc,%20I%20would%20like%20to%20inquire%20about%20plywood%20supply%20in%20Ethiopia.`}
+                      href={`https://wa.me/${siteConfig.contact.whatsapp.replace(/[^0-9]/g, "")}?text=Hello%20bmtradingplc,%20I%20would%20like%20to%20inquire%20about%20plywood%20supply%20in%20Ethiopia.`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md transition-all"

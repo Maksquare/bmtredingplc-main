@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle2, ShieldCheck, Truck, Coins, BarChart3, Clock } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Truck, Coins, Clock } from "lucide-react";
 import { siteConfig } from "@/lib/siteConfig";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
@@ -11,75 +11,75 @@ export function WhyChooseUs() {
       icon: ShieldCheck,
       title: "Zero Core Voids & Certified Adhesives",
       description:
-        "Every batch of BS 1088 marine and structural plywood features 100% solid, gap-free inner veneer layers. Fortified with phenolic WBP resins that withstand 72-hour boiling water immersion tests.",
-      badge: "Quality Guarantee",
+        "Every consignment of BS 1088 marine and shuttering plywood is inspected for solid inner veneers. WBP phenolic resins withstand 72-hour boiling water testing without delamination.",
+      badge: "Quality Verified",
     },
     {
       icon: Clock,
-      title: "Direct Importer Supply Reliability",
+      title: "Direct Importer Inventory & Buffer Stock",
       description:
-        "As primary importers with expansive regional warehouse holdings, we eliminate intermediary supply chains. We guarantee zero stockout interruptions for large-scale ongoing project phases.",
-      badge: "Zero Stockouts",
+        "As direct importers with large warehouse capacity in Addis Ababa, we eliminate intermediary delays and maintain buffer stock to guarantee uninterrupted concrete casting cycles.",
+      badge: "Stock Reliability",
     },
     {
       icon: Coins,
-      title: "Competitive Wholesale Pricing",
+      title: "Wholesale Contractor Pricing",
       description:
-        "Direct factory container contracting allows bmtredingplc to offer transparent tier-1 volume discounts for commercial developers, fabrication yards, and regional hardware stockists.",
-      badge: "Factory Direct",
+        "Container-level purchasing power allows us to offer transparent tiered pricing for commercial developers, general contractors, and architectural joinery shops.",
+      badge: "Direct Importer",
     },
     {
       icon: Truck,
-      title: "Dedicated Jobsite & Yard Dispatch",
+      title: "Jobsite Dispatch Across Ethiopia",
       description:
-        "Equipped with dedicated heavy transport fleet logistics, we offer scheduled jobsite crane drop-offs and same-day warehouse gate collections to keep your project on schedule.",
-      badge: "Fast Dispatch",
+        "Scheduled flatbed delivery coordinated with on-site crane offloading or immediate central warehouse collection to keep your carpenters and formwork crews on schedule.",
+      badge: "Yard Logistics",
     },
   ];
 
   return (
-    <Section variant="cream-surface" padded="default" className="border-y border-cream-border/70">
+    <Section variant="cream-surface" padded="default" className="py-12 sm:py-16 lg:py-20 border-y border-cream-border/70">
       <Container size="wide">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-3">
           <Reveal variant="fade-up">
-            <span className="text-xs font-bold uppercase tracking-widest text-amber-oak bg-amber-pale px-3.5 py-1.5 rounded-full border border-amber-light/30">
-              The {siteConfig.name} Advantage
+            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-oak bg-white px-3 py-1 rounded-full border border-cream-border/90 shadow-2xs">
+              Material Standards
             </span>
           </Reveal>
           <Reveal variant="fade-up" delay={0.1}>
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-charcoal">
-              Why Tier-1 Contractors Rely on Our Supply Chain
+            <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-charcoal">
+              Why Tier-1 Contractors Depend on Our Panels
             </h2>
           </Reveal>
           <Reveal variant="fade-up" delay={0.2}>
-            <p className="text-base text-charcoal-muted leading-relaxed">
-              In high-stakes civil concrete casting, naval shipwrighting, and custom architectural millwork, panel failure is not an option. Here is how {siteConfig.name} protects your build integrity.
+            <p className="text-sm sm:text-base text-charcoal-muted leading-relaxed">
+              In heavy civil formwork, naval applications, and architectural millwork, panel defects mean costly delays. We deliver verified panel integrity sheet after sheet.
             </p>
           </Reveal>
         </div>
 
-        {/* 4 Pillars Grid */}
+        {/* 4 Pillars Grid with Tactile Micro-Interactions */}
         <StaggerContainer
-          staggerDelay={0.1}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          staggerDelay={0.08}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
         >
           {pillars.map((pillar, i) => {
             const Icon = pillar.icon;
             return (
               <StaggerItem key={i}>
-                <div className="bg-white rounded-2xl border border-cream-border p-7 h-full flex flex-col justify-between shadow-sm hover:shadow-lg hover:border-amber-oak/40 transition-all duration-300">
-                  <div className="space-y-4">
+                <div className="bg-white rounded-xl sm:rounded-2xl border border-cream-border/90 p-5 sm:p-6 h-full flex flex-col justify-between shadow-xs hover:shadow-lg hover:border-amber-oak/50 transition-all duration-300 hover:-translate-y-1 group">
+                  <div className="space-y-3.5">
                     <div className="flex items-center justify-between">
-                      <div className="w-12 h-12 rounded-xl bg-forest/5 text-forest flex items-center justify-center">
-                        <Icon className="w-6 h-6 text-amber-oak" />
+                      <div className="w-10 h-10 rounded-xl bg-forest/5 text-forest flex items-center justify-center group-hover:bg-amber-pale transition-colors duration-200">
+                        <Icon className="w-5 h-5 text-amber-oak" />
                       </div>
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal-muted bg-cream-surface px-2.5 py-1 rounded-md">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-muted bg-cream-surface px-2 py-0.5 rounded-md">
                         {pillar.badge}
                       </span>
                     </div>
 
-                    <h3 className="font-display text-lg font-bold text-charcoal leading-snug">
+                    <h3 className="font-display text-base font-bold text-charcoal leading-snug group-hover:text-forest transition-colors">
                       {pillar.title}
                     </h3>
 
@@ -88,8 +88,8 @@ export function WhyChooseUs() {
                     </p>
                   </div>
 
-                  <div className="pt-6 border-t border-cream-border/60 flex items-center gap-2 text-xs font-semibold text-forest">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <div className="pt-4 mt-4 border-t border-cream-border/60 flex items-center gap-2 text-xs font-semibold text-forest">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Tested & Certified</span>
                   </div>
                 </div>
@@ -101,4 +101,3 @@ export function WhyChooseUs() {
     </Section>
   );
 }
-

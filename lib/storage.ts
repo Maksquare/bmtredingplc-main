@@ -8,7 +8,7 @@ const UPLOAD_DIR =
   path.join(process.cwd(), "uploads");
 
 const ASSETS_BASE_URL =
-  process.env.NEXT_PUBLIC_ASSETS_BASE_URL || "https://files.bmtredingplc.com";
+  process.env.NEXT_PUBLIC_ASSETS_BASE_URL || "https://files.bmtradingplc.com";
 
 // Allowed extensions and magic byte signatures
 const ALLOWED_EXTENSIONS = [
@@ -151,7 +151,7 @@ export async function uploadFile({
 
 /**
  * Returns the public URL for a stored asset.
- * If subdomain is files.bmtredingplc.com, points to it.
+ * If subdomain is files.bmtradingplc.com, points to it.
  * Otherwise falls back to /api/uploads/{path}.
  */
 export function getPublicUrl(relativePath: string): string {

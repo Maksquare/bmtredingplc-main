@@ -1,28 +1,28 @@
 /**
- * bmtredingplc - Master Site Configuration
+ * bmtradingplc - Master Site Configuration
  * 
  * CRITICAL NAMING RULE:
- * The company name is exactly "bmtredingplc".
+ * The company name is exactly "bmtradingplc".
  * Never split, rewrite, or autocorrect it.
  */
 
 export const siteConfig = {
-  name: "bmtredingplc",
-  legalName: "bmtredingplc",
-  domain: "bmtredingplc.com",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "https://bmtredingplc.com",
-  assetsUrl: process.env.NEXT_PUBLIC_ASSETS_BASE_URL || "https://files.bmtredingplc.com",
+  name: "bmtradingplc",
+  legalName: "bmtradingplc",
+  domain: "bmtradingplc.com",
+  url: process.env.NEXT_PUBLIC_SITE_URL || "https://bmtradingplc.com",
+  assetsUrl: process.env.NEXT_PUBLIC_ASSETS_BASE_URL || "https://files.bmtradingplc.com",
   description: "Ethiopia's premier direct importer and wholesale supplier of certified marine plywood, high-cycle film-faced shuttering panels, architectural hardwoods, and engineered timber solutions.",
   tagline: "Architectural Timber & Industrial Plywood Solutions",
   country: "Ethiopia",
   contact: {
-    email: "info@bmtredingplc.com",
-    salesEmail: "sales@bmtredingplc.com",
+    email: "info@bmtradingplc.com",
+    salesEmail: "sales@bmtradingplc.com",
     phone: "+251 911 234 567",
     phoneDisplay: "+251 911 234 567",
     landline: "+251 11 667 8900",
     whatsapp: "+251911234567",
-    telegram: "bmtredingplc",
+    telegram: "bmtradingplc",
     address: {
       street: "Bole Sub-City, Woreda 03, Industrial Commercial Corridor",
       city: "Addis Ababa",
@@ -33,10 +33,10 @@ export const siteConfig = {
     hours: "Monday – Friday: 08:00 – 17:30 | Saturday: 08:30 – 13:00 (EAT)",
   },
   social: {
-    linkedin: "https://linkedin.com/company/bmtredingplc",
-    facebook: "https://facebook.com/bmtredingplc",
-    instagram: "https://instagram.com/bmtredingplc",
-    twitter: "https://twitter.com/bmtredingplc",
+    linkedin: "https://linkedin.com/company/bmtradingplc",
+    facebook: "https://facebook.com/bmtradingplc",
+    instagram: "https://instagram.com/bmtradingplc",
+    twitter: "https://twitter.com/bmtradingplc",
   },
   stats: [
     { label: "Years of Supply Reliability", value: 18, suffix: "+" },
@@ -50,7 +50,6 @@ export const siteConfig = {
     { name: "Products", href: "/products" },
     { name: "Applications", href: "/services" },
     { name: "Projects", href: "/gallery" },
-    { name: "News & Insights", href: "/blog" },
     { name: "Contact", href: "/contact" },
   ],
 };

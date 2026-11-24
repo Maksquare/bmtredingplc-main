@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import { siteConfig } from "@/lib/siteConfig";
+import { MobileBottomBar } from "@/components/layout/MobileBottomBar";
+import { ToastProvider } from "@/lib/toast-context";
+import { OfflineBanner } from "@/components/system/OfflineBanner";
+import { CookieConsent } from "@/components/system/CookieConsent";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -31,7 +35,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   keywords: [
-    "bmtredingplc",
+    "bmtradingplc",
     "marine plywood BS 1088",
     "film-faced shuttering plywood",
     "commercial plywood",
@@ -39,7 +43,9 @@ export const metadata: Metadata = {
     "flexible bendy plywood",
     "blockboard suppliers",
     "industrial MDF boards",
-    "timber supplier Tanzania",
+    "timber supplier Ethiopia",
+    "plywood importer Addis Ababa",
+    "Ethiopia construction materials",
     "concrete formwork plywood",
   ],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
@@ -71,7 +77,7 @@ export const metadata: Metadata = {
     title: `${siteConfig.name} | Industrial Timber & Plywood Solutions`,
     description: siteConfig.description,
     images: ["/images/og-image.jpg"],
-    creator: "@bmtredingplc",
+    creator: "@bmtradingplc",
   },
   robots: {
     index: true,
@@ -130,8 +136,13 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col font-sans bg-cream text-charcoal">
-        {children}
+      <body className="min-h-full flex flex-col font-sans bg-cream text-charcoal pb-16 md:pb-0">
+        <ToastProvider>
+          <OfflineBanner />
+          {children}
+          <CookieConsent />
+          <MobileBottomBar />
+        </ToastProvider>
       </body>
     </html>
   );

@@ -99,11 +99,6 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/blog" className="hover:text-amber-light transition-colors">
-                    Technical Timber Insights
-                  </Link>
-                </li>
-                <li>
                   <Link href="/quote" className="hover:text-amber-light transition-colors font-medium text-amber-light">
                     Request a Custom Quote
                   </Link>

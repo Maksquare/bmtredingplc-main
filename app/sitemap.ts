@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/siteConfig";
-import { products, blogPosts, categories } from "@/data/seed-data";
+import { products, categories } from "@/data/seed-data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = siteConfig.url;
@@ -11,7 +11,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/products",
     "/services",
     "/gallery",
-    "/blog",
     "/contact",
     "/quote",
     "/privacy",
@@ -30,13 +29,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  const blogRoutes: MetadataRoute.Sitemap = blogPosts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: post.published_at || new Date().toISOString(),
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }));
-
-  return [...staticRoutes, ...productRoutes, ...blogRoutes];
+  return [...staticRoutes, ...productRoutes];
 }
 

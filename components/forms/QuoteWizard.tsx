@@ -17,12 +17,14 @@ import { categories, products } from "@/data/seed-data";
 import { siteConfig } from "@/lib/siteConfig";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { useToast } from "@/lib/toast-context";
 
 interface QuoteWizardProps {
   initialProduct?: string;
 }
 
 export function QuoteWizard({ initialProduct = "" }: QuoteWizardProps) {
+  const { showToast } = useToast();
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
@@ -106,9 +108,19 @@ export function QuoteWizard({ initialProduct = "" }: QuoteWizardProps) {
       }
 
       setIsSuccess(true);
+      showToast({
+        type: "success",
+        title: "RFQ Submitted Successfully",
+        message: "Your official quote proforma has been queued for yard dispatch review.",
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
       setErrorMsg(msg);
+      showToast({
+        type: "error",
+        title: "Submission Error",
+        message: msg,
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -187,7 +199,7 @@ export function QuoteWizard({ initialProduct = "" }: QuoteWizardProps) {
                   {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : s.number}
                 </div>
                 <span
-                  className={`text-[11px] font-semibold mt-1.5 transition-colors hidden sm:block ${
+                  className={`text-[10px] sm:text-[11px] font-bold mt-1.5 transition-colors text-center line-clamp-1 max-w-[85px] sm:max-w-none ${
                     isCurrent ? "text-amber-oak" : "text-charcoal-muted"
                   }`}
                 >
@@ -425,8 +437,8 @@ export function QuoteWizard({ initialProduct = "" }: QuoteWizardProps) {
 
                   {formData.deliveryType === "delivery" && (
                     <Input
-                      label="Target Jobsite City or Region"
-                      placeholder="e.g. Dar es Salaam, Arusha, Dodoma, Zanzibar, etc."
+                      label="Target Jobsite City or Region in Ethiopia"
+                      placeholder="e.g. Addis Ababa (Bole, Kality, Kazanchis), Hawassa, Adama, etc."
                       value={formData.deliveryAddress}
                       onChange={(e) =>
                         setFormData({
@@ -525,7 +537,7 @@ export function QuoteWizard({ initialProduct = "" }: QuoteWizardProps) {
                     <Input
                       label="Phone / WhatsApp Number"
                       type="tel"
-                      placeholder="e.g. +255 745 000 000"
+                      placeholder="e.g. +251 911 234 567"
                       required
                       value={formData.phone}
                       onChange={(e) =>
@@ -559,6 +571,8 @@ export function QuoteWizard({ initialProduct = "" }: QuoteWizardProps) {
                     variant="amber"
                     size="lg"
                     isLoading={isSubmitting}
+                    loadingText="Generating Commercial RFQ..."
+                    disabled={isSubmitting}
                     className="font-bold shadow-md shadow-amber-oak/20"
                     rightIcon={<CheckCircle2 className="w-4 h-4 ml-1" />}
                   >

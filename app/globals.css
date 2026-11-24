@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  /* High-Contrast Luxury Architectural Brand Tokens (Inspired by FORM AT WOOD) */
+  /* High-Contrast Luxury Architectural Brand Tokens */
   --color-forest: #0B241B;
   --color-forest-dark: #071711;
   --color-forest-light: #163B2D;
@@ -77,6 +77,19 @@ html {
   color: var(--color-charcoal);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+}
+
+/* Luxury brand selection styling */
+::selection {
+  background-color: #C8832A;
+  color: #FFFFFF;
+}
+
+/* Branded input caret */
+input, textarea {
+  caret-color: #C8832A;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -90,7 +103,7 @@ html {
   }
 }
 
-/* Architectural woodgrain background patterns (named pattern-* so tailwind-merge never strips bg-color) */
+/* Architectural woodgrain background patterns */
 .pattern-timber-grain,
 .bg-timber-grain {
   background-color: var(--color-cream);
@@ -118,7 +131,7 @@ html {
 .animate-marquee {
   display: flex;
   width: max-content;
-  animation: marquee 32s linear infinite;
+  animation: marquee 35s linear infinite;
   will-change: transform;
 }
 
@@ -138,8 +151,8 @@ textarea:focus-visible {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
@@ -153,4 +166,9 @@ textarea:focus-visible {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #AF6F1E;
+}
+
+/* Safe area insets for modern mobile viewports */
+.safe-area-inset-bottom {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }

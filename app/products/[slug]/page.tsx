@@ -23,6 +23,8 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { ProductCard } from "@/components/products/ProductCard";
+import { ProductGalleryRail } from "@/components/products/ProductGalleryRail";
+import { ProductVariantSelector } from "@/components/products/ProductVariantSelector";
 
 export async function generateStaticParams() {
   return products.map((product) => ({
@@ -135,63 +137,9 @@ export default async function ProductDetailPage({
         <Section variant="cream" woodgrain padded="default">
           <Container size="wide">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-              {/* Left Column: Visual Architectural Showcase & Gallery */}
+              {/* Left Column: Interactive Architectural Gallery Rail & Stage */}
               <div className="lg:col-span-5 space-y-4">
-                <div className="relative aspect-[4/3] rounded-3xl bg-charcoal border-2 border-cream-border overflow-hidden shadow-xl group">
-                  <Image
-                    src={product.images[0] || "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?q=80&w=1000&auto=format&fit=crop"}
-                    alt={product.name}
-                    fill
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 450px"
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-                  {/* Corner Badges */}
-                  <div className="absolute top-4 left-4 flex gap-2 z-10">
-                    <Badge variant="amber" size="sm" className="font-bold shadow-md">
-                      Calibrated
-                    </Badge>
-                    <Badge variant="forest" size="sm" className="bg-forest/90 text-white border-white/20">
-                      {product.specs.grade}
-                    </Badge>
-                  </div>
-
-                  {/* Bottom Image Caption */}
-                  <div className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between">
-                    <span className="text-xs font-bold text-amber-300 bg-black/60 backdrop-blur-md px-3 py-1 rounded-lg border border-white/20">
-                      {product.specs.surface_finish.split("(")[0]}
-                    </span>
-                    <span className="text-xs font-bold text-white bg-forest/90 px-2.5 py-1 rounded-lg border border-white/20">
-                      {product.specs.standard_size}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Sub-gallery thumbnail indicators */}
-                {product.images.length > 1 && (
-                  <div className="grid grid-cols-2 gap-3">
-                    {product.images.map((img, idx) => (
-                      <div
-                        key={idx}
-                        className="relative aspect-[16/10] rounded-xl overflow-hidden border border-cream-border shadow-xs group"
-                      >
-                        <Image
-                          src={img}
-                          alt={`${product.name} angle ${idx + 1}`}
-                          fill
-                          sizes="200px"
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />
-                        <span className="absolute bottom-1.5 left-1.5 text-[10px] font-bold text-white bg-black/70 px-2 py-0.5 rounded">
-                          Angle {idx + 1}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <ProductGalleryRail product={product} />
 
                 {/* Direct Spec Sheet Download Card */}
                 <div className="bg-white rounded-2xl border border-cream-border p-5 flex items-center justify-between gap-4 shadow-xs">
@@ -241,29 +189,8 @@ export default async function ProductDetailPage({
                   </p>
                 </div>
 
-                {/* CTA Action Bar */}
-                <div className="p-6 rounded-2xl bg-white border border-cream-border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-amber-oak block">
-                      Wholesale Supply Available
-                    </span>
-                    <span className="text-sm font-semibold text-charcoal">
-                      Container loads & jobsite flatbed dispatch
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <Button
-                      href={`/quote?product=${encodeURIComponent(product.name)}`}
-                      variant="amber"
-                      size="default"
-                      leftIcon={<FileText className="w-4 h-4" />}
-                      className="w-full sm:w-auto font-bold"
-                    >
-                      Request a Quote
-                    </Button>
-                  </div>
-                </div>
+                {/* Interactive Variant Configurator & Yard Quoting Stage */}
+                <ProductVariantSelector product={product} />
 
                 {/* Technical Specifications Table */}
                 <div className="space-y-4">
@@ -405,9 +332,12 @@ export default async function ProductDetailPage({
                 </Link>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Responsive Timber Panel Rail on Mobile / Grid on Desktop */}
+              <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible pb-4 sm:pb-0 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
                 {relatedProducts.map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                  <div key={p.id} className="min-w-[270px] sm:min-w-0 snap-start flex-1 flex flex-col">
+                    <ProductCard product={p} />
+                  </div>
                 ))}
               </div>
             </Container>

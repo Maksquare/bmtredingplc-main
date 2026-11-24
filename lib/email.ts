@@ -1,9 +1,9 @@
 import nodemailer from "nodemailer";
 import { siteConfig } from "./siteConfig";
 
-const smtpHost = process.env.SMTP_HOST || "mail.bmtredingplc.com";
+const smtpHost = process.env.SMTP_HOST || "mail.bmtradingplc.com";
 const smtpPort = parseInt(process.env.SMTP_PORT || "465", 10);
-const smtpUser = process.env.SMTP_USER || "info@bmtredingplc.com";
+const smtpUser = process.env.SMTP_USER || "info@bmtradingplc.com";
 const smtpPass = process.env.SMTP_PASSWORD || "";
 const smtpSecure = process.env.SMTP_SECURE !== "false"; // default true for port 465 SSL
 
@@ -44,7 +44,7 @@ export async function sendEmail({
   const transporter = getTransporter();
 
   if (!transporter) {
-    console.log(`[Email Simulation - bmtredingplc] To: ${to} | Subject: ${subject}`);
+    console.log(`[Email Simulation - bmtradingplc] To: ${to} | Subject: ${subject}`);
     return { success: true, messageId: "simulated-id" };
   }
 
@@ -60,7 +60,7 @@ export async function sendEmail({
 
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error("[Email Error - bmtredingplc]", error);
+    console.error("[Email Error - bmtradingplc]", error);
     return { success: false };
   }
 }

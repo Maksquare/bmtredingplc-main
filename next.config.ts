@@ -6,12 +6,12 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "files.bmtredingplc.com",
+        hostname: "files.bmtradingplc.com",
         pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "bmtredingplc.com",
+        hostname: "bmtradingplc.com",
         pathname: "/**",
       },
       {
@@ -20,6 +20,20 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: "/blog/:path*",
+        destination: "/products",
+        permanent: true,
+      },
+      {
+        source: "/blog",
+        destination: "/products",
+        permanent: true,
+      },
+    ];
   },
 };
 
