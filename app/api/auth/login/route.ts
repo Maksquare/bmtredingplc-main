@@ -1,10 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import crypto from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
+import {
+  createSignedStaffToken,
+  STAFF_SESSION_COOKIE,
+} from "@/lib/auth/session";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
+
+const AUTHORIZED_STAFF_EMAILS = new Set([
+  "admin@bmtradingplc.com",
+  "director@bmtradingplc.com",
+  "operations@bmtradingplc.com",
+  "info@bmtradingplc.com",
+]);
+
+function constantTimeMatch(input: string, expected: string): boolean {
+  const inputHash = crypto.createHash("sha256").update(input).digest();
+  const expectedHash = crypto.createHash("sha256").update(expected).digest();
+  return crypto.timingSafeEqual(inputHash, expectedHash);
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password } = await request.json();
+    const ip = getClientIp(request);
+    const rate = checkRateLimit(`login:${ip}`, 10, 15 * 60 * 1000);
+    if (!rate.allowed) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please try again shortly." },
+        {
+          status: 429,
+          headers: { "Retry-After": rate.retryAfterSeconds.toString() },
+        }
+      );
+    }
+
+    const body = await request.json();
+    const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+    const password = typeof body?.password === "string" ? body.password : "";
 
     if (!email || !password) {
       return NextResponse.json(
@@ -16,7 +49,7 @@ export async function POST(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    // 1. Try Supabase Auth if configured
+    // 1. Try Supabase Auth when configured
     if (supabaseUrl && supabaseAnonKey && !supabaseUrl.includes("placeholder-project")) {
       try {
         const supabase = await createClient();
@@ -25,17 +58,27 @@ export async function POST(request: NextRequest) {
           password,
         });
 
-        if (error) {
-          return NextResponse.json({ error: error.message }, { status: 401 });
+        if (error || !data.user) {
+          return NextResponse.json(
+            { error: "Invalid email or password." },
+            { status: 401 }
+          );
         }
 
+        const token = createSignedStaffToken({
+          id: data.user.id,
+          email: data.user.email || email,
+          name: (data.user.user_metadata?.full_name as string) || "Admin Staff",
+          role: "administrator",
+        });
+
         const cookieStore = await cookies();
-        cookieStore.set("bmt_staff_session", JSON.stringify({ email: data.user.email, id: data.user.id }), {
+        cookieStore.set(STAFF_SESSION_COOKIE, token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
           path: "/",
-          maxAge: 60 * 60 * 24 * 7, // 7 days
+          maxAge: 60 * 60 * 24 * 7,
         });
 
         return NextResponse.json({
@@ -43,57 +86,47 @@ export async function POST(request: NextRequest) {
           user: {
             id: data.user.id,
             email: data.user.email,
-            name: data.user.user_metadata?.full_name || "Admin Staff",
+            name: (data.user.user_metadata?.full_name as string) || "Admin Staff",
             role: "administrator",
           },
         });
       } catch (sbErr) {
-        console.warn("[Supabase Auth fallback to Staff Auth]", sbErr);
+        console.warn("[Supabase Auth fallback note]", sbErr);
       }
     }
 
-    // 2. Built-in Staff / Admin Auth Fallback
-    // Allows immediate access for authorized timber yard administrators
-    const validEmails = [
-      "admin@bmtradingplc.com",
-      "director@bmtradingplc.com",
-      "operations@bmtradingplc.com",
-      "info@bmtradingplc.com",
-    ];
-
-    const isAuthorizedEmail = validEmails.includes(email.toLowerCase()) || email.endsWith("@bmtradingplc.com");
-    // Standard default pass for yard admin or test
-    const isValidPassword = password.length >= 6;
+    // 2. Staff Portal Credentials (when Supabase Auth is not active / local mode)
+    const configuredPassword = process.env.ADMIN_ACCESS_PASSWORD || "bmt2026";
+    const isAuthorizedEmail = AUTHORIZED_STAFF_EMAILS.has(email);
+    const isValidPassword = constantTimeMatch(password, configuredPassword);
 
     if (!isAuthorizedEmail || !isValidPassword) {
       return NextResponse.json(
-        { error: "Invalid staff credentials. Use your @bmtradingplc.com administrator account." },
+        { error: "Invalid staff credentials. Verify your account email and password." },
         { status: 401 }
       );
     }
 
+    const displayName = `${email.split("@")[0].toUpperCase()} • Operations`;
+    const signedToken = createSignedStaffToken({
+      email,
+      name: displayName,
+      role: "administrator",
+    });
+
     const cookieStore = await cookies();
-    cookieStore.set(
-      "bmt_staff_session",
-      JSON.stringify({
-        email: email.toLowerCase(),
-        name: email.split("@")[0].toUpperCase() + " • Operations",
-        role: "administrator",
-        logged_in_at: new Date().toISOString(),
-      }),
-      {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24 * 7,
-      }
-    );
+    cookieStore.set(STAFF_SESSION_COOKIE, signedToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
 
     return NextResponse.json({
       success: true,
       user: {
-        email: email.toLowerCase(),
+        email,
         name: "Admin • Operations Desk",
         role: "administrator",
       },
@@ -106,4 +139,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

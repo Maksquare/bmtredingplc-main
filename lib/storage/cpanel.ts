@@ -124,7 +124,8 @@ export async function uploadFileToCpanel({
       folder,
       storage_type: isRunningOnCpanel ? "cpanel_disk" : "local_fallback",
     };
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Disk write error";
     console.error("[cPanel Disk Upload Failed]", err);
     return {
       success: false,
@@ -134,7 +135,7 @@ export async function uploadFileToCpanel({
       mime_type: file.type,
       folder,
       storage_type: "local_fallback",
-      error: err?.message || "Disk write error",
+      error: message,
     };
   }
 }

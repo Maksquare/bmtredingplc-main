@@ -3,82 +3,85 @@ import { contactApiSchema } from "@/lib/validations";
 import { sendEmail } from "@/lib/email";
 import { siteConfig } from "@/lib/siteConfig";
 import { createAdminClient } from "@/lib/supabase/server";
+import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
-    const json = await request.json();
+    const ip = getClientIp(request);
+    const rate = checkRateLimit(`contact:${ip}`, 8, 10 * 60 * 1000);
+    if (!rate.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Too many inquiry requests. Please wait a few minutes before sending again.",
+        },
+        {
+          status: 429,
+          headers: { "Retry-After": rate.retryAfterSeconds.toString() },
+        }
+      );
+    }
 
-    // 1. Zod Validation
-    const parsed = contactApiSchema.safeParse(json);
+    const body = await request.json();
+    const parsed = contactApiSchema.safeParse(body);
+
     if (!parsed.success) {
       return NextResponse.json(
-        { error: parsed.error.issues[0]?.message || "Invalid input data" },
+        {
+          success: false,
+          error: "Please check the highlighted form fields and try again.",
+          issues: parsed.error.flatten().fieldErrors,
+        },
         { status: 400 }
       );
     }
 
-    const { name, email, phone, product, quantity, message, company, website_hp } =
-      parsed.data;
-
-    // 2. Honeypot Bot Check
-    if (website_hp) {
-      return NextResponse.json({ success: true }); // Silent drop
+    const data = parsed.data;
+    if (data.website_hp) {
+      return NextResponse.json({ success: true }, { status: 200 });
     }
 
-    // 3. Database Insertion (Supabase) if configured
+    // 1. Database Insertion (Supabase) if configured
     try {
       if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         const supabase = createAdminClient();
         await supabase.from("inquiries").insert({
-          name,
-          email,
-          phone,
-          product,
-          quantity,
-          message: company ? `[Company: ${company}]\n${message}` : message,
+          id: `inq-${Date.now()}`,
+          name: data.name,
+          company: data.company || "",
+          email: data.email,
+          phone: data.phone,
+          product: data.product,
+          quantity: data.quantity,
+          message: data.message,
           status: "new",
+          created_at: new Date().toISOString(),
         });
       }
     } catch (dbErr) {
       console.warn("[Inquiry DB Insert Note - Operating in Static/Hybrid Mode]", dbErr);
     }
 
-    // 4. Send Email Notification to Sales Desk
+    // 2. Notification email (optional if SMTP is configured)
     await sendEmail({
       to: siteConfig.contact.email,
-      replyTo: email,
-      subject: `[New Inquiry] ${product} (${quantity}) - ${name}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #E5DCCE; border-radius: 12px; overflow: hidden;">
-          <div style="background-color: #1C3A2F; padding: 20px; color: #FAF7F2;">
-            <h2 style="margin: 0; color: #FAF7F2;">${siteConfig.name} - Commercial Inquiry</h2>
-            <p style="margin: 5px 0 0 0; color: #EAA84F; font-size: 13px;">New Web Specification Form Submission</p>
-          </div>
-          <div style="padding: 24px; color: #1F2420;">
-            <p><strong>Customer Name:</strong> ${name}</p>
-            ${company ? `<p><strong>Company:</strong> ${company}</p>` : ""}
-            <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-            <p><strong>Phone:</strong> <a href="tel:${phone}">${phone}</a></p>
-            <hr style="border: 0; border-top: 1px solid #E5DCCE; margin: 20px 0;" />
-            <p><strong>Product Requested:</strong> ${product}</p>
-            <p><strong>Estimated Quantity:</strong> ${quantity}</p>
-            <p><strong>Message / Project Notes:</strong></p>
-            <div style="background-color: #F4EFE6; padding: 14px; border-radius: 8px; font-size: 14px; white-space: pre-wrap;">${message}</div>
-          </div>
-        </div>
-      `,
+      replyTo: data.email,
+      subject: `[bmtradingplc Inquiry] ${data.product} — ${data.name}`,
+      text: `Name: ${data.name}\nCompany: ${data.company || "N/A"}\nPhone: ${data.phone}\nEmail: ${data.email}\nProduct Interest: ${data.product}\n\nMessage:\n${data.message}`,
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Inquiry received. Our sales desk will respond within 2 hours.",
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Inquiry sent successfully.",
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("[Contact API Error]", error);
     return NextResponse.json(
-      { error: "Internal server error. Please call our sales hotline directly." },
+      { success: false, error: "Could not send inquiry right now." },
       { status: 500 }
     );
   }
 }
-

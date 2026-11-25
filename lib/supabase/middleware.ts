@@ -1,5 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  STAFF_SESSION_COOKIE,
+  verifySignedStaffToken,
+} from "@/lib/auth/session";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -7,14 +11,19 @@ export async function updateSession(request: NextRequest) {
   });
 
   const pathname = request.nextUrl.pathname;
-  const staffSession = request.cookies.get("bmt_staff_session")?.value;
+  const rawStaffSession = request.cookies.get(STAFF_SESSION_COOKIE)?.value;
+  const verifiedStaff = verifySignedStaffToken(rawStaffSession);
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  let hasAuthUser = !!staffSession;
+  let hasAuthUser = Boolean(verifiedStaff);
 
-  if (supabaseUrl && supabaseAnonKey) {
+  if (
+    supabaseUrl &&
+    supabaseAnonKey &&
+    !supabaseUrl.includes("placeholder-project")
+  ) {
     const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
@@ -41,6 +50,11 @@ export async function updateSession(request: NextRequest) {
     if (user) {
       hasAuthUser = true;
     }
+  }
+
+  // Clear invalid or tampered cookie if present
+  if (rawStaffSession && !verifiedStaff && !hasAuthUser) {
+    supabaseResponse.cookies.delete(STAFF_SESSION_COOKIE);
   }
 
   // Protect /admin routes

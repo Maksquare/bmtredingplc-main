@@ -1,24 +1,19 @@
-import { createClient as createBrowserClient } from "./client";
 import { createClient as createServerClient, createAdminClient } from "./server";
 import {
   Product,
   Category,
   Quote,
   Inquiry,
-  GalleryItem,
   Partner,
   Testimonial,
-  SiteSettings,
   MediaAsset,
 } from "@/types";
 import {
   products as initialProducts,
   categories as initialCategories,
-  galleryItems as initialGallery,
   partners as initialPartners,
   testimonials as initialTestimonials,
 } from "@/data/seed-data";
-import { siteConfig } from "@/lib/siteConfig";
 
 const isSupabaseConfigured = () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -222,8 +217,6 @@ export async function insertSupabaseQuote(quote: Omit<Quote, "id" | "created_at"
       client_phone: quote.client_phone,
       product_requested: quote.product_requested,
       quantity: quote.quantity,
-      estimated_amount: quote.amount,
-      currency: quote.currency || "ETB",
       status: quote.status || "pending",
       internal_notes: quote.notes,
       created_at: new Date().toISOString(),
@@ -249,17 +242,15 @@ export async function insertSupabaseQuote(quote: Omit<Quote, "id" | "created_at"
 export async function updateSupabaseQuoteStatus(
   id: string,
   status: Quote["status"],
-  notes?: string,
-  amount?: number
+  notes?: string
 ): Promise<boolean> {
   try {
     const supabase = createAdminClient();
-    const updates: Record<string, any> = {
+    const updates: Record<string, unknown> = {
       status,
       updated_at: new Date().toISOString(),
     };
     if (notes !== undefined) updates.internal_notes = notes;
-    if (amount !== undefined) updates.estimated_amount = amount;
 
     const { error } = await supabase.from("quotes").update(updates).eq("id", id);
     return !error;
@@ -326,7 +317,7 @@ export async function updateSupabaseInquiryStatus(
 ): Promise<boolean> {
   try {
     const supabase = createAdminClient();
-    const updates: Record<string, any> = {
+    const updates: Record<string, unknown> = {
       status,
       updated_at: new Date().toISOString(),
     };
@@ -340,24 +331,8 @@ export async function updateSupabaseInquiryStatus(
 }
 
 // ============================================================================
-// 5. GALLERY, PARTNERS, TESTIMONIALS & SETTINGS
+// 5. PARTNERS, TESTIMONIALS & SETTINGS
 // ============================================================================
-export async function getSupabaseGallery(): Promise<GalleryItem[]> {
-  if (!isSupabaseConfigured()) return initialGallery;
-
-  try {
-    const supabase = await createServerClient();
-    const { data, error } = await supabase
-      .from("gallery_items")
-      .select("*")
-      .order("order_index", { ascending: true });
-
-    if (error || !data || data.length === 0) return initialGallery;
-    return data;
-  } catch {
-    return initialGallery;
-  }
-}
 
 export async function getSupabasePartners(): Promise<Partner[]> {
   if (!isSupabaseConfigured()) return initialPartners;

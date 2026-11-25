@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Bricolage_Grotesque, Inter } from "next/font/google";
 import { siteConfig } from "@/lib/siteConfig";
 import { MobileBottomBar } from "@/components/layout/MobileBottomBar";
 import { ToastProvider } from "@/lib/toast-context";
@@ -7,22 +7,22 @@ import { OfflineBanner } from "@/components/system/OfflineBanner";
 import { CookieConsent } from "@/components/system/CookieConsent";
 import "./globals.css";
 
-const playfair = Playfair_Display({
+const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-bricolage",
   display: "swap",
   weight: ["500", "600", "700", "800"],
 });
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-inter",
   display: "swap",
   weight: ["300", "400", "500", "600", "700"],
 });
 
 export const viewport: Viewport = {
-  themeColor: "#1C3A2F",
+  themeColor: "#0B241B",
   width: "device-width",
   initialScale: 1,
 };
@@ -30,23 +30,20 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: `${siteConfig.name} | Industrial Timber & Plywood Solutions`,
+    default: `${siteConfig.name} | Safarian Boards & Structural Plywood`,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
   keywords: [
     "bmtradingplc",
-    "marine plywood BS 1088",
-    "film-faced shuttering plywood",
-    "commercial plywood",
-    "hardwood structural plywood",
-    "flexible bendy plywood",
-    "blockboard suppliers",
-    "industrial MDF boards",
-    "timber supplier Ethiopia",
-    "plywood importer Addis Ababa",
-    "Ethiopia construction materials",
-    "concrete formwork plywood",
+    "Safarian board Ethiopia",
+    "Safarian 03mm 06mm 08mm 12mm",
+    "18mm plywood special product",
+    "16mm plywood Ethiopia",
+    "plywood manufacturer Werabe",
+    "plywood supplier Addis Ababa Ayer Tena",
+    "Midroc construction plywood supplier",
+    "Mina Furniture Warit Classic Furniture board supplier",
   ],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
   creator: siteConfig.name,
@@ -60,23 +57,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: siteConfig.url,
-    title: `${siteConfig.name} | Industrial Timber & Plywood Solutions`,
+    title: `${siteConfig.name} | Safarian Boards & Structural Plywood`,
     description: siteConfig.description,
     siteName: siteConfig.name,
-    images: [
-      {
-        url: "/images/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: `${siteConfig.name} - Industrial-Grade Timber & Plywood Solutions`,
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.name} | Industrial Timber & Plywood Solutions`,
+    title: `${siteConfig.name} | Safarian Boards & Structural Plywood`,
     description: siteConfig.description,
-    images: ["/images/og-image.jpg"],
     creator: "@bmtradingplc",
   },
   robots: {
@@ -102,24 +90,61 @@ export default function RootLayout({
 }) {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: siteConfig.name,
-    legalName: siteConfig.legalName,
-    url: siteConfig.url,
-    logo: `${siteConfig.url}/logo.png`,
-    description: siteConfig.description,
-    telephone: siteConfig.contact.phone,
-    email: siteConfig.contact.email,
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: siteConfig.contact.address.street,
-      addressLocality: siteConfig.contact.address.city,
-      addressCountry: siteConfig.contact.address.country,
-    },
-    sameAs: [
-      siteConfig.social.linkedin,
-      siteConfig.social.facebook,
-      siteConfig.social.instagram,
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${siteConfig.url}/#organization`,
+        name: siteConfig.name,
+        legalName: siteConfig.legalName,
+        url: siteConfig.url,
+        logo: `${siteConfig.url}/logo.png`,
+        description: siteConfig.description,
+        email: siteConfig.contact.email,
+        telephone: siteConfig.contact.phone,
+        contactPoint: [
+          {
+            "@type": "ContactPoint",
+            telephone: siteConfig.contact.phone,
+            contactType: "sales",
+            areaServed: "ET",
+            availableLanguage: ["en", "am"],
+          },
+          {
+            "@type": "ContactPoint",
+            telephone: siteConfig.contact.secondaryPhone,
+            contactType: "customer service",
+            areaServed: "ET",
+          },
+        ],
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: siteConfig.contact.address.street,
+          addressLocality: siteConfig.contact.address.city,
+          addressCountry: "ET",
+        },
+        sameAs: [
+          siteConfig.social.linkedin,
+          siteConfig.social.facebook,
+          siteConfig.social.instagram,
+        ],
+      },
+      {
+        "@type": "LocalBusiness",
+        "@id": `${siteConfig.url}/#factory`,
+        name: `${siteConfig.name} Manufacturing Plant`,
+        url: siteConfig.url,
+        image: `${siteConfig.url}/images/products/plywood-18mm-special.jpg`,
+        telephone: siteConfig.contact.phone,
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: siteConfig.contact.factory.city,
+          addressRegion: siteConfig.contact.factory.region,
+          addressCountry: "ET",
+        },
+        parentOrganization: {
+          "@id": `${siteConfig.url}/#organization`,
+        },
+      },
     ],
   };
 
@@ -128,7 +153,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${playfair.variable} ${inter.variable} h-full antialiased`}
+      className={`${bricolage.variable} ${inter.variable} h-full antialiased`}
     >
       <head>
         <script
@@ -137,6 +162,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col font-sans bg-cream text-charcoal pb-16 md:pb-0">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[200] focus:px-4 focus:py-2 focus:rounded-xl focus:bg-[#0B241B] focus:text-white focus:font-bold focus:text-xs focus:shadow-xl"
+        >
+          Skip to main content
+        </a>
         <ToastProvider>
           <OfflineBanner />
           {children}

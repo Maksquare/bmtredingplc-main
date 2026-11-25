@@ -12,17 +12,16 @@ export const contactApiSchema = z.object({
 });
 
 export const quoteApiSchema = z.object({
-  fullName: z.string().min(2).max(100),
-  companyName: z.string().max(100).optional(),
+  name: z.string().min(2).max(100),
+  company: z.string().max(100).optional(),
   email: z.string().email(),
   phone: z.string().min(6).max(30),
-  productName: z.string().min(1).max(120),
+  product: z.string().min(1).max(120),
   thickness: z.string().max(50),
-  grade: z.string().max(100),
   quantity: z.string().min(1).max(100),
-  deliveryType: z.enum(["delivery", "yard_pickup"]),
-  deliveryAddress: z.string().max(200).optional(),
-  targetDate: z.string().max(50).optional(),
+  application: z.string().max(120).optional(),
+  location: z.string().max(200).optional(),
+  timeline: z.string().max(80).optional(),
   notes: z.string().max(2000).optional(),
   hp_field: z.string().max(0, "Spam detected").optional(),
 });

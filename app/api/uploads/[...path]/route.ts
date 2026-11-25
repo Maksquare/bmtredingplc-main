@@ -31,8 +31,8 @@ export async function GET(
     const resolvedUploadDir = path.resolve(/*turbopackIgnore: true*/ UPLOAD_DIR);
     const filePath = path.resolve(/*turbopackIgnore: true*/ resolvedUploadDir, relativePath);
 
-    // Prevent path traversal
-    if (!filePath.startsWith(resolvedUploadDir)) {
+    // Prevent path traversal including sibling-directory prefix match
+    if (!filePath.startsWith(resolvedUploadDir + path.sep)) {
       return new NextResponse("Access Denied", { status: 403 });
     }
 
@@ -50,7 +50,7 @@ export async function GET(
 
     const fileStream = fs.createReadStream(/*turbopackIgnore: true*/ filePath);
 
-    // Stream response with security headers & 30-day cache
+    // Stream response with strict security headers & 30-day cache
     const response = new NextResponse(fileStream as unknown as ReadableStream, {
       status: 200,
       headers: {
@@ -58,6 +58,7 @@ export async function GET(
         "Content-Length": stat.size.toString(),
         "Cache-Control": "public, max-age=2592000, immutable",
         "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "sandbox",
       },
     });
 

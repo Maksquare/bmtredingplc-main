@@ -17,17 +17,17 @@
   --color-charcoal-muted: #3D4A43;
   --color-charcoal-subtle: #5A6961;
 
-  --color-cream: #F8F5F0;
-  --color-cream-surface: #EFEAE0;
+  --color-cream: #FCFBF8;
+  --color-cream-surface: #F4EFE6;
   --color-cream-card: #FFFFFF;
-  --color-cream-border: #D8CFC0;
-  --color-cream-dark: #E4DCCE;
+  --color-cream-border: #E5DEC9;
+  --color-cream-dark: #EAE2D3;
 
-  --background: #F8F5F0;
+  --background: #FCFBF8;
   --foreground: #141715;
 
-  --font-display: 'Cinzel', 'Playfair Display', Georgia, serif;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-bricolage), system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
 }
 
 /* Brand Theme Utility Classes */
@@ -103,23 +103,15 @@ input, textarea {
   }
 }
 
-/* Architectural woodgrain background patterns */
+/* Clean architectural surface helpers */
 .pattern-timber-grain,
 .bg-timber-grain {
   background-color: var(--color-cream);
-  background-image: radial-gradient(rgba(200, 131, 42, 0.06) 1px, transparent 1px),
-    radial-gradient(rgba(11, 36, 27, 0.05) 1px, transparent 1px);
-  background-size: 32px 32px;
-  background-position: 0 0, 16px 16px;
 }
 
 .pattern-dark-grain,
 .bg-dark-grain {
   background-color: var(--color-forest);
-  background-image: radial-gradient(rgba(200, 131, 42, 0.12) 1px, transparent 1px),
-    radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-  background-size: 28px 28px;
-  background-position: 0 0, 14px 14px;
 }
 
 /* Infinite Marquee for Sliding Client/Partner Companies */

@@ -1,70 +1,100 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdminSession } from "@/lib/auth/require-admin";
+
+const isConfigured = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  return Boolean(url && key && !url.includes("placeholder-project"));
+};
+
+const VALID_ENTITIES = new Set([
+  "product",
+  "category",
+  "quote",
+  "inquiry",
+  "partner",
+  "testimonial",
+  "media",
+  "settings",
+]);
 
 export async function POST(request: NextRequest) {
-  try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const admin = await requireAdminSession();
+  if (!admin) {
+    return NextResponse.json({ error: "Unauthorized mutation request" }, { status: 401 });
+  }
 
-    if (!supabaseUrl || !serviceRoleKey || supabaseUrl.includes("placeholder-project")) {
-      return NextResponse.json({
-        success: true,
-        note: "Supabase not configured; operating in local reactive mode.",
-      });
+  if (!isConfigured()) {
+    return NextResponse.json({
+      success: true,
+      mode: "local",
+      message: "Updated local dashboard store (Supabase not configured)",
+    });
+  }
+
+  try {
+    const body = await request.json();
+    const { entity, action, data, id } = body;
+
+    if (typeof entity !== "string" || !VALID_ENTITIES.has(entity)) {
+      return NextResponse.json({ error: "Invalid entity" }, { status: 400 });
     }
 
     const supabase = createAdminClient();
-    const { entity, action, data, id } = await request.json();
 
-    if (action === "delete" && id) {
+    if (action === "delete" && typeof id === "string" && id.trim()) {
       const tableMap: Record<string, string> = {
         product: "products",
         category: "categories",
         quote: "quotes",
         inquiry: "inquiries",
-        gallery: "gallery_items",
         partner: "partners",
         testimonial: "testimonials",
         media: "media_assets",
       };
 
-      const tableName = tableMap[entity];
-      if (tableName) {
-        await supabase.from(tableName).delete().eq("id", id);
+      const table = tableMap[entity];
+      if (!table) {
+        return NextResponse.json({ error: `Entity cannot be deleted: ${entity}` }, { status: 400 });
       }
-      return NextResponse.json({ success: true });
+
+      const { error } = await supabase.from(table).delete().eq("id", id);
+      if (error) throw error;
+      return NextResponse.json({ success: true, deletedId: id });
     }
 
-    if (action === "upsert" && data) {
+    if (action === "upsert" && data && typeof data === "object") {
       if (entity === "product") {
-        await supabase.from("products").upsert({
+        const { error } = await supabase.from("products").upsert({
           id: data.id,
           name: data.name,
           slug: data.slug,
           category_id: data.category_id,
           short_description: data.short_description,
           description: data.description,
-          specs: data.specs,
-          applications: data.applications,
-          images: data.images,
-          is_featured: data.is_featured,
-          status: data.status,
-          pdf_url: data.pdf_url,
+          images: data.images || [],
+          specs: data.specs || {},
+          applications: data.applications || [],
+          is_featured: Boolean(data.is_featured),
+          status: data.status || "published",
+          pdf_url: data.pdf_url || null,
           updated_at: new Date().toISOString(),
         });
+        if (error) throw error;
       } else if (entity === "category") {
-        await supabase.from("categories").upsert({
+        const { error } = await supabase.from("categories").upsert({
           id: data.id,
           name: data.name,
           slug: data.slug,
           description: data.description,
           image_url: data.image_url,
-          order_index: data.order_index,
+          order_index: data.order_index || 0,
           is_active: data.is_active ?? true,
-          updated_at: new Date().toISOString(),
         });
+        if (error) throw error;
       } else if (entity === "quote") {
-        await supabase.from("quotes").upsert({
+        const { error } = await supabase.from("quotes").upsert({
           id: data.id,
           client_name: data.client_name,
           company_name: data.company_name,
@@ -72,14 +102,13 @@ export async function POST(request: NextRequest) {
           client_phone: data.client_phone,
           product_requested: data.product_requested,
           quantity: data.quantity,
-          estimated_amount: data.amount,
-          currency: data.currency || "ETB",
-          status: data.status,
+          status: data.status || "pending",
           internal_notes: data.notes,
           updated_at: new Date().toISOString(),
         });
+        if (error) throw error;
       } else if (entity === "inquiry") {
-        await supabase.from("inquiries").upsert({
+        const { error } = await supabase.from("inquiries").upsert({
           id: data.id,
           name: data.name,
           company: data.company,
@@ -88,102 +117,92 @@ export async function POST(request: NextRequest) {
           product: data.product,
           quantity: data.quantity,
           message: data.message,
-          status: data.status,
+          status: data.status || "new",
           internal_notes: data.notes,
           updated_at: new Date().toISOString(),
         });
-      } else if (entity === "gallery") {
-        await supabase.from("gallery_items").upsert({
-          id: data.id,
-          title: data.title,
-          project_name: data.project_name,
-          category: data.category,
-          image_url: data.image_url,
-          description: data.description,
-          order_index: data.order_index,
-          is_active: true,
-        });
+        if (error) throw error;
       } else if (entity === "partner") {
-        await supabase.from("partners").upsert({
+        const { error } = await supabase.from("partners").upsert({
           id: data.id,
           name: data.name,
-          category: data.category || "General Contractor Grade 1",
-          initials: data.initials || data.name.slice(0, 3).toUpperCase(),
+          category: data.category || "Client Partner",
+          initials: data.initials || "BM",
+          logo_url: data.logo_url || null,
           website_url: data.website_url,
-          order_index: data.order_index,
-          is_active: true,
+          order_index: data.order_index || 0,
+          is_active: data.is_active ?? true,
         });
+        if (error) throw error;
       } else if (entity === "testimonial") {
-        await supabase.from("testimonials").upsert({
+        const { error } = await supabase.from("testimonials").upsert({
           id: data.id,
           client_name: data.client_name,
           company: data.company,
           role: data.role,
           content: data.content,
-          rating: data.rating,
+          rating: data.rating || 5,
+          avatar_url: data.avatar_url || null,
           project_type: data.project_type,
           is_active: data.is_active ?? true,
         });
+        if (error) throw error;
+      } else if (entity === "media") {
+        const { error } = await supabase.from("media_assets").upsert({
+          id: data.id,
+          filename: data.file_name,
+          file_url: data.file_url,
+          file_type: data.mime_type || "image/jpeg",
+          file_size: data.file_size_bytes || 0,
+          folder: data.folder || "products",
+        });
+        if (error) throw error;
       } else if (entity === "settings") {
-        await supabase.from("site_settings").upsert({
+        const { data: existing } = await supabase
+          .from("site_settings")
+          .select("id")
+          .limit(1)
+          .maybeSingle();
+
+        const payload = {
           company_name: data.company_name,
           tagline: data.tagline,
-          description: data.meta_description,
           contact_email: data.contact_email,
           sales_email: data.sales_email,
           phone: data.phone,
+          phone_display: data.phone,
+          secondary_phone: data.secondary_phone,
+          tertiary_phone: data.tertiary_phone,
           whatsapp: data.whatsapp,
+          telegram: data.telegram,
           street_address: data.address,
+          factory_address: data.factory_address,
           business_hours: data.business_hours,
+          description: data.meta_description,
           updated_at: new Date().toISOString(),
-        });
+        };
+
+        if (existing?.id) {
+          const { error } = await supabase
+            .from("site_settings")
+            .update(payload)
+            .eq("id", existing.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.from("site_settings").insert(payload);
+          if (error) throw error;
+        }
       }
-      return NextResponse.json({ success: true });
+
+      return NextResponse.json({ success: true, entity });
     }
 
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.warn("[Admin Mutate Warning]", error);
-    return NextResponse.json({ success: false, error: error?.message });
+    return NextResponse.json({ error: "Invalid action or payload" }, { status: 400 });
+  } catch (err) {
+    console.error("[Admin Supabase Mutation Error]", err);
+    return NextResponse.json(
+      { error: "Failed to persist change to Supabase PostgreSQL" },
+      { status: 500 }
+    );
   }
 }
-
-export async function GET(request: NextRequest) {
-  try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !serviceRoleKey || supabaseUrl.includes("placeholder-project")) {
-      return NextResponse.json({ configured: false });
-    }
-
-    const supabase = createAdminClient();
-
-    const [productsRes, categoriesRes, quotesRes, inquiriesRes, galleryRes, partnersRes, testimonialsRes] =
-      await Promise.all([
-        supabase.from("products").select("*").order("created_at", { ascending: false }),
-        supabase.from("categories").select("*").order("order_index", { ascending: true }),
-        supabase.from("quotes").select("*").order("created_at", { ascending: false }),
-        supabase.from("inquiries").select("*").order("created_at", { ascending: false }),
-        supabase.from("gallery_items").select("*").order("order_index", { ascending: true }),
-        supabase.from("partners").select("*").order("order_index", { ascending: true }),
-        supabase.from("testimonials").select("*").order("created_at", { ascending: false }),
-      ]);
-
-    return NextResponse.json({
-      configured: true,
-      data: {
-        products: productsRes.data || [],
-        categories: categoriesRes.data || [],
-        quotes: quotesRes.data || [],
-        inquiries: inquiriesRes.data || [],
-        gallery: galleryRes.data || [],
-        partners: partnersRes.data || [],
-        testimonials: testimonialsRes.data || [],
-      },
-    });
-  } catch (error: any) {
-    return NextResponse.json({ configured: false, error: error?.message });
-  }
-}
-

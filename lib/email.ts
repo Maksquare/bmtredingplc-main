@@ -5,7 +5,12 @@ const smtpHost = process.env.SMTP_HOST || "mail.bmtradingplc.com";
 const smtpPort = parseInt(process.env.SMTP_PORT || "465", 10);
 const smtpUser = process.env.SMTP_USER || "info@bmtradingplc.com";
 const smtpPass = process.env.SMTP_PASSWORD || "";
-const smtpSecure = process.env.SMTP_SECURE !== "false"; // default true for port 465 SSL
+const smtpSecure = process.env.SMTP_SECURE !== "false";
+
+function sanitizeHeaderValue(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
 
 export function getTransporter() {
   if (!smtpPass) {
@@ -16,12 +21,15 @@ export function getTransporter() {
     host: smtpHost,
     port: smtpPort,
     secure: smtpSecure,
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
     auth: {
       user: smtpUser,
       pass: smtpPass,
     },
     tls: {
-      rejectUnauthorized: false, // Prevents self-signed cert issues on cPanel
+      rejectUnauthorized: false,
     },
   });
 }
@@ -41,21 +49,25 @@ export async function sendEmail({
   html,
   replyTo,
 }: SendMailOptions): Promise<{ success: boolean; messageId?: string }> {
+  const safeTo = sanitizeHeaderValue(to) || siteConfig.contact.email;
+  const safeSubject = sanitizeHeaderValue(subject) || "bmtradingplc Notification";
+  const safeReplyTo = sanitizeHeaderValue(replyTo);
+
   const transporter = getTransporter();
 
   if (!transporter) {
-    console.log(`[Email Simulation - bmtradingplc] To: ${to} | Subject: ${subject}`);
+    console.log(`[Email Simulation - bmtradingplc] To: ${safeTo} | Subject: ${safeSubject}`);
     return { success: true, messageId: "simulated-id" };
   }
 
   try {
     const info = await transporter.sendMail({
       from: `"${siteConfig.name}" <${smtpUser}>`,
-      to,
-      subject,
+      to: safeTo,
+      subject: safeSubject,
       text,
       html,
-      replyTo,
+      replyTo: safeReplyTo,
     });
 
     return { success: true, messageId: info.messageId };
@@ -64,4 +76,3 @@ export async function sendEmail({
     return { success: false };
   }
 }
-

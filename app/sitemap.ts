@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/siteConfig";
-import { products, categories } from "@/data/seed-data";
+import { products } from "@/data/seed-data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = siteConfig.url;
@@ -9,8 +9,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/about",
     "/products",
-    "/services",
-    "/gallery",
     "/contact",
     "/quote",
     "/privacy",
@@ -26,9 +24,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}/products/${product.slug}`,
     lastModified: product.created_at || new Date().toISOString(),
     changeFrequency: "weekly",
-    priority: 0.8,
+    priority: 0.85,
   }));
 
   return [...staticRoutes, ...productRoutes];
 }
-
