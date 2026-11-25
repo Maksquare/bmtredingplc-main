@@ -22,7 +22,7 @@ export function AdminOnboardingTour() {
   useEffect(() => {
     const saved = localStorage.getItem("bmt_admin_onboarding_dismissed");
     if (saved === "true") {
-      setIsDismissed(true);
+      queueMicrotask(() => setIsDismissed(true));
     }
   }, []);
 
@@ -36,8 +36,8 @@ export function AdminOnboardingTour() {
   const steps = [
     {
       id: 1,
-      title: "Certified Timber Catalog Populated",
-      desc: "All 7 BS 1088 marine and shuttering products seeded into inventory.",
+      title: "Safarian & Plywood Catalog Populated",
+      desc: "Safarian (03mm–12mm) and Plywood (16mm / 18mm Special Product) seeded into inventory.",
       href: "/admin/products",
       cta: "View Catalog",
       icon: Layers,

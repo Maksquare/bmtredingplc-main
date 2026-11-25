@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,13 +30,12 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     },
     ref
   ) => {
-    const generatedId = id || React.useId();
+    const autoId = React.useId();
+    const generatedId = id || autoId;
     const errorId = `${generatedId}-error`;
     const helperId = `${generatedId}-helper`;
-    const [isTouched, setIsTouched] = useState(false);
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-      setIsTouched(true);
       if (onBlur) onBlur(e);
     };
 
@@ -140,12 +139,12 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       disabled,
       maxLength,
       currentLength,
-      onBlur,
       ...props
     },
     ref
   ) => {
-    const generatedId = id || React.useId();
+    const autoId = React.useId();
+    const generatedId = id || autoId;
     const errorId = `${generatedId}-error`;
     const helperId = `${generatedId}-helper`;
 

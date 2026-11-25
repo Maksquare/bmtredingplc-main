@@ -62,7 +62,7 @@ export function AdminHeader({
             >
               <option value="super_admin" className="bg-charcoal text-white">Super Admin (Full)</option>
               <option value="manager" className="bg-charcoal text-white">Manager (No Delete)</option>
-              <option value="staff" className="bg-charcoal text-white">Yard Staff (Orders/Quotes)</option>
+              <option value="staff" className="bg-charcoal text-white">Staff (Quotes &amp; Inquiries)</option>
               <option value="viewer" className="bg-charcoal text-white">Viewer (Read-Only)</option>
             </select>
           </div>

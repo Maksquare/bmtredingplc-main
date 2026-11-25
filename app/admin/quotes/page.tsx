@@ -39,13 +39,11 @@ export default function AdminQuotesPage({
 
   // Status edit state in modal
   const [editStatus, setEditStatus] = useState<Quote["status"]>("pending");
-  const [editAmount, setEditAmount] = useState<string>("");
   const [editNotes, setEditNotes] = useState<string>("");
 
   const handleOpenDetail = (quote: Quote) => {
     setSelectedQuote(quote);
     setEditStatus(quote.status);
-    setEditAmount(quote.amount ? quote.amount.toString() : "");
     setEditNotes(quote.notes || "");
   };
 
@@ -53,12 +51,7 @@ export default function AdminQuotesPage({
     e.preventDefault();
     if (!selectedQuote) return;
 
-    updateQuoteStatus(
-      selectedQuote.id,
-      editStatus,
-      editNotes,
-      editAmount ? parseFloat(editAmount) : undefined
-    );
+    updateQuoteStatus(selectedQuote.id, editStatus, editNotes);
 
     setSelectedQuote(null);
   };
@@ -81,7 +74,7 @@ export default function AdminQuotesPage({
   const statusBadges = {
     pending: { label: "Pending Review", class: "bg-amber-100 text-amber-800 border-amber-300" },
     reviewing: { label: "In Review", class: "bg-blue-100 text-blue-800 border-blue-300" },
-    sent: { label: "Proforma Sent", class: "bg-purple-100 text-purple-800 border-purple-300" },
+    sent: { label: "Quote Sent", class: "bg-purple-100 text-purple-800 border-purple-300" },
     accepted: { label: "Accepted / Won", class: "bg-emerald-100 text-emerald-800 border-emerald-300" },
     declined: { label: "Declined", class: "bg-red-100 text-red-800 border-red-300" },
   };
@@ -150,7 +143,6 @@ export default function AdminQuotesPage({
                   <th className="py-3.5 px-4 font-bold">Contractor / Client</th>
                   <th className="py-3.5 px-4 font-bold">Requested Specification</th>
                   <th className="py-3.5 px-4 font-bold">Quantity</th>
-                  <th className="py-3.5 px-4 font-bold">Estimated Amount</th>
                   <th className="py-3.5 px-4 font-bold">Status</th>
                   <th className="py-3.5 px-4 font-bold">Date Received</th>
                   <th className="py-3.5 px-4 font-bold text-right">Actions</th>
@@ -194,17 +186,6 @@ export default function AdminQuotesPage({
                         <span className="font-bold text-charcoal block">
                           {q.quantity}
                         </span>
-                      </td>
-
-                      {/* Estimated Amount */}
-                      <td className="py-3.5 px-4">
-                        {q.amount ? (
-                          <span className="font-bold text-forest">
-                            {q.amount.toLocaleString()} {q.currency || "ETB"}
-                          </span>
-                        ) : (
-                          <span className="text-charcoal-muted italic">Awaiting Quote</span>
-                        )}
                       </td>
 
                       {/* Status */}
@@ -298,7 +279,7 @@ export default function AdminQuotesPage({
                   Quote ID: {selectedQuote.id}
                 </span>
                 <h3 className="font-display text-lg font-bold text-charcoal">
-                  Contractor RFQ Review & Proforma
+                  Quote Request Review
                 </h3>
               </div>
               <button
@@ -369,38 +350,25 @@ export default function AdminQuotesPage({
               )}
             </div>
 
-            {/* Status & Pricing Update Section */}
+            {/* Status Update Section (Zero Pricing) */}
             <div className="space-y-3 pt-2 border-t border-cream-border text-xs">
               <h4 className="font-bold text-charcoal uppercase tracking-wider text-[11px]">
-                Update Status & Proforma Value
+                Update Quote Status
               </h4>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="font-bold text-charcoal block">Quotation Status</label>
-                  <select
-                    value={editStatus}
-                    onChange={(e) => setEditStatus(e.target.value as Quote["status"])}
-                    className="w-full h-10 px-3 bg-white rounded-xl border border-cream-border text-charcoal font-bold focus:border-amber-oak focus:outline-none"
-                  >
-                    <option value="pending">Pending Review</option>
-                    <option value="reviewing">In Review (Calculating Stock)</option>
-                    <option value="sent">Proforma Sent to Client</option>
-                    <option value="accepted">Accepted / Deposit Paid</option>
-                    <option value="declined">Declined</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1">
-                  <label className="font-bold text-charcoal block">Proforma Amount (ETB)</label>
-                  <input
-                    type="number"
-                    value={editAmount}
-                    onChange={(e) => setEditAmount(e.target.value)}
-                    placeholder="e.g. 1500000"
-                    className="w-full h-10 px-3 bg-white rounded-xl border border-cream-border text-charcoal font-bold focus:border-amber-oak focus:outline-none"
-                  />
-                </div>
+              <div className="space-y-1">
+                <label className="font-bold text-charcoal block">Quotation Status</label>
+                <select
+                  value={editStatus}
+                  onChange={(e) => setEditStatus(e.target.value as Quote["status"])}
+                  className="w-full h-10 px-3 bg-white rounded-xl border border-cream-border text-charcoal font-bold focus:border-amber-oak focus:outline-none"
+                >
+                  <option value="pending">Pending Review</option>
+                  <option value="reviewing">In Review (Checking Stock)</option>
+                  <option value="sent">Response Sent to Client</option>
+                  <option value="accepted">Confirmed / Scheduled</option>
+                  <option value="declined">Declined</option>
+                </select>
               </div>
 
               <div className="space-y-1">

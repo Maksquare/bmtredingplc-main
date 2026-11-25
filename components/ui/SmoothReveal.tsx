@@ -52,7 +52,8 @@ export function SmoothReveal({
             duration,
             delay,
             stagger,
-            ease: "power2.out",
+            immediateRender: false,
+            ease: "power3.out",
             scrollTrigger: {
               trigger: el,
               start,
@@ -70,7 +71,8 @@ export function SmoothReveal({
             y: 0,
             duration,
             delay,
-            ease: "back.out(1.4)",
+            immediateRender: false,
+            ease: "power3.out",
             scrollTrigger: {
               trigger: el,
               start,
@@ -88,6 +90,7 @@ export function SmoothReveal({
             clipPath: "inset(0 0 0% 0)",
             duration,
             delay,
+            immediateRender: false,
             ease: "power3.out",
             scrollTrigger: {
               trigger: el,
@@ -105,6 +108,7 @@ export function SmoothReveal({
             x: 0,
             duration,
             delay,
+            immediateRender: false,
             ease: "power3.out",
             scrollTrigger: {
               trigger: el,
@@ -122,6 +126,7 @@ export function SmoothReveal({
             x: 0,
             duration,
             delay,
+            immediateRender: false,
             ease: "power3.out",
             scrollTrigger: {
               trigger: el,
@@ -140,6 +145,7 @@ export function SmoothReveal({
             y: 0,
             duration,
             delay,
+            immediateRender: false,
             ease: "power3.out",
             scrollTrigger: {
               trigger: el,

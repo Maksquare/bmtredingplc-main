@@ -58,13 +58,6 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       badge: null,
     },
     {
-      name: "Orders & Shipments",
-      href: "/admin/orders",
-      icon: Truck,
-      badge: "5",
-      badgeVariant: "emerald",
-    },
-    {
       name: "Product Categories",
       href: "/admin/categories",
       icon: FolderTree,
@@ -88,12 +81,6 @@ export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       name: "Customers & Accounts",
       href: "/admin/customers",
       icon: Users,
-      badge: null,
-    },
-    {
-      name: "Project Gallery",
-      href: "/admin/gallery",
-      icon: Images,
       badge: null,
     },
     {

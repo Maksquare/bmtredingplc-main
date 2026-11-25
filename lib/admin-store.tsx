@@ -6,13 +6,10 @@ import {
   Category,
   Quote,
   Inquiry,
-  GalleryItem,
   Partner,
   Testimonial,
   SiteSettings,
   MediaAsset,
-  Order,
-  OrderStatus,
   Customer,
   InventoryAdjustment,
   AdminRole,
@@ -20,200 +17,146 @@ import {
 import {
   products as initialProducts,
   categories as initialCategories,
-  galleryItems as initialGallery,
   partners as initialPartners,
   testimonials as initialTestimonials,
-  orders as initialOrders,
   customers as initialCustomers,
   inventoryAdjustments as initialAdjustments,
 } from "@/data/seed-data";
 import { siteConfig } from "@/lib/siteConfig";
 
-// Initial seed Quotes for real-time dashboard preview
 const seedQuotes: Quote[] = [
   {
     id: "quote-101",
-    client_name: "Eng. Dawit Haile",
-    client_email: "dawit.h@midrocconstruction.com",
+    client_name: "Dawit Tesfaye",
+    company_name: "MIDROC Investment Group",
+    client_email: "procurement@midroc-et.com",
     client_phone: "+251 911 445 566",
-    product_requested: "ProForm Dynea Film-Faced Shuttering Plywood (18mm, 120g/m² Dynea Phenolic)",
-    quantity: "1,200 Sheets (2 Full Containers)",
+    product_requested: "Plywood (18mm - Special Product)",
+    quantity: "800 Sheets",
     status: "reviewing",
-    amount: 3450000,
-    currency: "ETB",
-    notes: "Delivery Mode: delivery | Destination: Bole Commercial Tower Project, Addis Ababa | Target Date: End of month | Notes: Urgent concrete pour phase 2.",
+    notes: "Destination: Addis Ababa Commercial Project | Target: Immediate Dispatch | Heavy-duty architectural joinery.",
     created_at: new Date(Date.now() - 3600000 * 4).toISOString(),
   },
   {
     id: "quote-102",
-    client_name: "Bethlehem Tadesse",
-    client_email: "bethlehem@addiscraftinteriors.et",
+    client_name: "Selamawit Bekele",
+    company_name: "Mina Furniture",
+    client_email: "production@minafurniture.et",
     client_phone: "+251 912 334 455",
-    product_requested: "VeneerCraft Bintangor Commercial Hardwood Plywood (12mm, B/BB Grade)",
+    product_requested: "Safarian (08mm & 12mm)",
     quantity: "450 Sheets",
     status: "pending",
-    amount: 1120000,
-    currency: "ETB",
-    notes: "Delivery Mode: yard_pickup | Destination: Yard Pickup | Target Date: Next week | Notes: Automated CNC cabinet pressing batch.",
+    notes: "Destination: Addis Ababa | Scheduled workshop batch for wardrobe cabinetry and partitions.",
     created_at: new Date(Date.now() - 3600000 * 18).toISOString(),
   },
   {
     id: "quote-103",
-    client_name: "Eng. Yohannes Bekele",
-    client_email: "yohannes.b@afrotsion.com",
+    client_name: "Yohannes Abebe",
+    company_name: "Classic Furniture",
+    client_email: "supply@classicfurniture.et",
     client_phone: "+251 913 778 899",
-    product_requested: "AquaShield BS 1088 Marine Grade Plywood (18mm, 100% Solid Gurjan Core)",
-    quantity: "800 Sheets",
+    product_requested: "Plywood (16mm & 18mm - Special Product)",
+    quantity: "600 Sheets",
     status: "sent",
-    amount: 2890000,
-    currency: "ETB",
-    notes: "Delivery Mode: delivery | Destination: Bridge Abutment Site, Oromia Regional Corridor | Target Date: 10 days | Notes: Lab boil test report required with proforma.",
+    notes: "Destination: Addis Ababa Showroom & Plant | Flagship 18mm Plywood allocation confirmed from Werabe.",
     created_at: new Date(Date.now() - 3600000 * 36).toISOString(),
   },
   {
     id: "quote-104",
-    client_name: "Mulugeta Assefa",
-    client_email: "mulugeta@flintstoneeng.com",
+    client_name: "Mulugeta Kebede",
+    company_name: "Warit Furniture",
+    client_email: "operations@waritfurniture.et",
     client_phone: "+251 911 889 900",
-    product_requested: "TitanDeck Keruing Wiremesh Anti-Slip Plywood (21mm, Heavy Duty)",
-    quantity: "300 Sheets",
+    product_requested: "Safarian (03mm & 06mm)",
+    quantity: "500 Sheets",
     status: "accepted",
-    amount: 1450000,
-    currency: "ETB",
-    notes: "Delivery Mode: delivery | Destination: Kality Logistics Depot, Addis Ababa | Target Date: Completed | Notes: Truck bed scaffolding deck installation.",
+    notes: "Destination: Addis Ababa | Drawer bottoms and backing boards allocation confirmed.",
     created_at: new Date(Date.now() - 3600000 * 72).toISOString(),
   },
 ];
 
-// Initial seed Inquiries from contact form
 const seedInquiries: Inquiry[] = [
   {
     id: "inq-201",
-    name: "Almaz Kebede",
-    company: "Varnero Construction PLC",
-    email: "almaz.k@varneroet.com",
+    name: "Henok Tadesse",
+    company: "Mina Furniture",
+    email: "henok@minafurniture.et",
     phone: "+251 911 654 321",
-    product: "ProForm 18mm Shuttering Plywood",
-    quantity: "600 Sheets",
-    message: "We need 600 sheets of 18mm high-pour shuttering plywood for our residential tower project in Kazanchis. Please confirm stock availability and flatbed delivery timing.",
+    product: "18mm Special Product Plywood",
+    quantity: "350 Sheets",
+    message: "Please confirm batch readiness for 18mm Special Product Plywood and 08mm Safarian sheets for pickup or delivery.",
     status: "new",
     created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
   },
   {
     id: "inq-202",
-    name: "Tewodros Girma",
-    company: "Sunshine Construction",
-    email: "tewodros@sunshineplc.com",
+    name: "Tigist Girma",
+    company: "Warit Furniture",
+    email: "tigist@waritfurniture.et",
     phone: "+251 912 998 877",
-    product: "AquaShield BS 1088 Marine 25mm",
-    quantity: "200 Sheets",
-    message: "Requesting quotation for 25mm BS 1088 marine plywood with 72-hour boil test certification. Yard pickup.",
+    product: "Safarian (03mm, 06mm, 12mm)",
+    quantity: "400 Sheets",
+    message: "Following up on monthly Safarian thickness allocation from Werabe factory.",
     status: "contacted",
     created_at: new Date(Date.now() - 3600000 * 14).toISOString(),
   },
-  {
-    id: "inq-203",
-    name: "Semira Nur",
-    company: "Addis Hotel Furnishings",
-    email: "semira@addishotelfurniture.com",
-    phone: "+251 914 112 233",
-    product: "SolidCore Hardwood Blockboard 18mm",
-    quantity: "350 Sheets",
-    message: "Supplying 150 hotel guestroom wardrobe units. Can we inspect sample blockboard specimens at your Bole yard tomorrow?",
-    status: "quoted",
-    created_at: new Date(Date.now() - 3600000 * 48).toISOString(),
-  },
 ];
 
-// Initial Site Settings
 const initialSettings: SiteSettings = {
-  id: "default-settings",
+  id: "settings-1",
   company_name: siteConfig.name,
   tagline: siteConfig.tagline,
   contact_email: siteConfig.contact.email,
   sales_email: siteConfig.contact.salesEmail,
-  phone: siteConfig.contact.phone,
+  phone: siteConfig.contact.phoneDisplay,
+  secondary_phone: siteConfig.contact.secondaryPhoneDisplay,
+  tertiary_phone: siteConfig.contact.tertiaryPhoneDisplay,
   whatsapp: siteConfig.contact.whatsapp,
+  telegram: siteConfig.contact.telegram,
   address: siteConfig.contact.address.full,
+  factory_address: siteConfig.contact.factory.full,
   business_hours: siteConfig.contact.hours,
-  hero_title: "Architectural Timber & Industrial Plywood Solutions in Ethiopia",
-  hero_subtitle: "Certified BS 1088 marine plywood, Dynea film-faced shuttering panels, and architectural joinery boards direct from primary importer yards in Addis Ababa.",
+  hero_title: "Precision Safarian & 18mm Special Plywood in Ethiopia",
+  hero_subtitle: siteConfig.description,
   meta_description: siteConfig.description,
 };
 
-// Initial Media Library Assets
 const seedMedia: MediaAsset[] = [
   {
     id: "media-1",
-    file_name: "proform-dynea-shuttering-18mm.jpg",
-    file_url: "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?q=80&w=1000&auto=format&fit=crop",
-    file_size_bytes: 1420000,
+    file_name: "safarian-main.jpg",
+    file_url: "/images/products/safarian-main.jpg",
+    file_size_bytes: 664245,
     mime_type: "image/jpeg",
     folder: "products",
     created_at: new Date(Date.now() - 3600000 * 240).toISOString(),
   },
   {
     id: "media-2",
-    file_name: "aquashield-bs1088-marine-plywood.jpg",
-    file_url: "https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?q=80&w=1000&auto=format&fit=crop",
-    file_size_bytes: 1840000,
+    file_name: "plywood-18mm-special.jpg",
+    file_url: "/images/products/plywood-18mm-special.jpg",
+    file_size_bytes: 792933,
     mime_type: "image/jpeg",
     folder: "products",
-    created_at: new Date(Date.now() - 3600000 * 210).toISOString(),
+    created_at: new Date(Date.now() - 3600000 * 200).toISOString(),
   },
   {
     id: "media-3",
-    file_name: "veneercraft-bintangor-hardwood.jpg",
-    file_url: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=1000&auto=format&fit=crop",
-    file_size_bytes: 1180000,
+    file_name: "plywood-16mm-stack.jpg",
+    file_url: "/images/products/plywood-16mm-stack.jpg",
+    file_size_bytes: 699264,
     mime_type: "image/jpeg",
     folder: "products",
-    created_at: new Date(Date.now() - 3600000 * 180).toISOString(),
+    created_at: new Date(Date.now() - 3600000 * 150).toISOString(),
   },
   {
     id: "media-4",
-    file_name: "titandeck-wiremesh-anti-slip.jpg",
-    file_url: "https://images.unsplash.com/photo-1516455590571-18256e5bb9ff?q=80&w=1000&auto=format&fit=crop",
-    file_size_bytes: 2040000,
-    mime_type: "image/jpeg",
-    folder: "products",
-    created_at: new Date(Date.now() - 3600000 * 140).toISOString(),
-  },
-  {
-    id: "media-5",
-    file_name: "addis-commercial-bank-hq-formwork.jpg",
-    file_url: "https://images.unsplash.com/photo-1541888946425-d0fbb18615f3?q=80&w=1000&auto=format&fit=crop",
-    file_size_bytes: 2450000,
+    file_name: "safarian-detail.jpg",
+    file_url: "/images/products/safarian-detail.jpg",
+    file_size_bytes: 735075,
     mime_type: "image/jpeg",
     folder: "gallery",
     created_at: new Date(Date.now() - 3600000 * 100).toISOString(),
-  },
-  {
-    id: "media-6",
-    file_name: "bole-luxury-residences-cabinetry.jpg",
-    file_url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1000&auto=format&fit=crop",
-    file_size_bytes: 1680000,
-    mime_type: "image/jpeg",
-    folder: "gallery",
-    created_at: new Date(Date.now() - 3600000 * 70).toISOString(),
-  },
-  {
-    id: "media-7",
-    file_name: "bmtradingplc-bs1088-spec-sheet.pdf",
-    file_url: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-    file_size_bytes: 480000,
-    mime_type: "application/pdf",
-    folder: "specs",
-    created_at: new Date(Date.now() - 3600000 * 50).toISOString(),
-  },
-  {
-    id: "media-8",
-    file_name: "bmtradingplc-primary-brand-mark.svg",
-    file_url: "/globe.svg",
-    file_size_bytes: 32000,
-    mime_type: "image/svg+xml",
-    folder: "brand",
-    created_at: new Date(Date.now() - 3600000 * 300).toISOString(),
   },
 ];
 
@@ -222,80 +165,60 @@ interface AdminContextType {
   categories: Category[];
   quotes: Quote[];
   inquiries: Inquiry[];
-  gallery: GalleryItem[];
   partners: Partner[];
   testimonials: Testimonial[];
   media: MediaAsset[];
   settings: SiteSettings;
-  orders: Order[];
   customers: Customer[];
   inventoryAdjustments: InventoryAdjustment[];
   currentRole: AdminRole;
   setCurrentRole: (role: AdminRole) => void;
-  // Product actions
+  isLoaded: boolean;
+  undoDeletedProduct: Product | null;
   addProduct: (product: Omit<Product, "id" | "created_at">) => void;
   updateProduct: (id: string, updates: Partial<Product>) => void;
   deleteProduct: (id: string) => void;
-  undoDeletedProduct: Product | null;
   undoDeleteProduct: () => void;
-  // Category actions
-  addCategory: (category: Omit<Category, "id">) => void;
+  addCategory: (cat: Omit<Category, "id">) => void;
   updateCategory: (id: string, updates: Partial<Category>) => void;
   deleteCategory: (id: string) => void;
-  // Order actions
-  updateOrderStatus: (id: string, status: OrderStatus) => void;
-  // Customer actions
   updateCustomerStatus: (id: string, status: Customer["status"]) => void;
-  // Inventory actions
   adjustStock: (
     productId: string,
     delta: number,
     reason: InventoryAdjustment["reason"],
     notes?: string
   ) => Promise<{ success: boolean; error?: string }>;
-  // Quote actions
-  updateQuoteStatus: (id: string, status: Quote["status"], notes?: string, amount?: number) => void;
+  updateQuoteStatus: (id: string, status: Quote["status"], notes?: string) => void;
   deleteQuote: (id: string) => void;
-  // Inquiry actions
   updateInquiryStatus: (id: string, status: Inquiry["status"], notes?: string) => void;
   deleteInquiry: (id: string) => void;
-  // Gallery actions
-  addGalleryItem: (item: Omit<GalleryItem, "id" | "created_at">) => void;
-  updateGalleryItem: (id: string, updates: Partial<GalleryItem>) => void;
-  deleteGalleryItem: (id: string) => void;
-  // Partner actions
   addPartner: (partner: Omit<Partner, "id">) => void;
   updatePartner: (id: string, updates: Partial<Partner>) => void;
   deletePartner: (id: string) => void;
-  // Testimonial actions
-  addTestimonial: (test: Omit<Testimonial, "id">) => void;
+  addTestimonial: (item: Omit<Testimonial, "id">) => void;
   updateTestimonial: (id: string, updates: Partial<Testimonial>) => void;
   deleteTestimonial: (id: string) => void;
-  // Media actions
   addMediaAsset: (asset: Omit<MediaAsset, "id" | "created_at">) => void;
   deleteMediaAsset: (id: string) => void;
-  // Settings actions
   updateSettings: (updates: Partial<SiteSettings>) => void;
-  // Reset store
   resetToDefaults: () => void;
 }
 
 const AdminContext = createContext<AdminContextType | null>(null);
 
 const STORAGE_KEYS = {
-  PRODUCTS: "bmt_admin_products",
-  CATEGORIES: "bmt_admin_categories",
-  QUOTES: "bmt_admin_quotes",
-  INQUIRIES: "bmt_admin_inquiries",
-  GALLERY: "bmt_admin_gallery",
-  PARTNERS: "bmt_admin_partners",
-  TESTIMONIALS: "bmt_admin_testimonials",
-  MEDIA: "bmt_admin_media",
-  SETTINGS: "bmt_admin_settings",
-  ORDERS: "bmt_admin_orders",
-  CUSTOMERS: "bmt_admin_customers",
-  ADJUSTMENTS: "bmt_admin_adjustments",
-  ROLE: "bmt_admin_role",
+  PRODUCTS: "bmt_admin_products_v3",
+  CATEGORIES: "bmt_admin_categories_v3",
+  QUOTES: "bmt_admin_quotes_v2",
+  INQUIRIES: "bmt_admin_inquiries_v2",
+  PARTNERS: "bmt_admin_partners_v3",
+  TESTIMONIALS: "bmt_admin_testimonials_v3",
+  MEDIA: "bmt_admin_media_v3",
+  SETTINGS: "bmt_admin_settings_v2",
+  CUSTOMERS: "bmt_admin_customers_v2",
+  ADJUSTMENTS: "bmt_admin_adjustments_v2",
+  ROLE: "bmt_admin_role_v2",
 };
 
 export function AdminProvider({ children }: { children: React.ReactNode }) {
@@ -303,71 +226,93 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [categories, setCategories] = useState<Category[]>(initialCategories);
   const [quotes, setQuotes] = useState<Quote[]>(seedQuotes);
   const [inquiries, setInquiries] = useState<Inquiry[]>(seedInquiries);
-  const [gallery, setGallery] = useState<GalleryItem[]>(initialGallery);
   const [partners, setPartners] = useState<Partner[]>(initialPartners);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
   const [media, setMedia] = useState<MediaAsset[]>(seedMedia);
   const [settings, setSettings] = useState<SiteSettings>(initialSettings);
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
-  const [inventoryAdjustments, setInventoryAdjustments] = useState<InventoryAdjustment[]>(initialAdjustments);
+  const [inventoryAdjustments, setInventoryAdjustments] =
+    useState<InventoryAdjustment[]>(initialAdjustments);
   const [currentRole, setCurrentRole] = useState<AdminRole>("super_admin");
-  const [undoDeletedProduct, setUndoDeletedProduct] = useState<Product | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [undoDeletedProduct, setUndoDeletedProduct] = useState<Product | null>(null);
 
-  // Load persisted data on client mount and synchronize with Supabase if configured
   useEffect(() => {
-    try {
-      const p = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-      if (p) setProducts(JSON.parse(p));
+    let active = true;
 
-      const c = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
-      if (c) setCategories(JSON.parse(c));
+    const hydrateLocal = () => {
+      try {
+        const p = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
+        if (p) setProducts(JSON.parse(p));
 
-      const q = localStorage.getItem(STORAGE_KEYS.QUOTES);
-      if (q) setQuotes(JSON.parse(q));
+        const c = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
+        if (c) setCategories(JSON.parse(c));
 
-      const i = localStorage.getItem(STORAGE_KEYS.INQUIRIES);
-      if (i) setInquiries(JSON.parse(i));
+        const q = localStorage.getItem(STORAGE_KEYS.QUOTES);
+        if (q) setQuotes(JSON.parse(q));
 
-      const g = localStorage.getItem(STORAGE_KEYS.GALLERY);
-      if (g) setGallery(JSON.parse(g));
+        const i = localStorage.getItem(STORAGE_KEYS.INQUIRIES);
+        if (i) setInquiries(JSON.parse(i));
 
-      const part = localStorage.getItem(STORAGE_KEYS.PARTNERS);
-      if (part) setPartners(JSON.parse(part));
+        const part = localStorage.getItem(STORAGE_KEYS.PARTNERS);
+        if (part) setPartners(JSON.parse(part));
 
-      const t = localStorage.getItem(STORAGE_KEYS.TESTIMONIALS);
-      if (t) setTestimonials(JSON.parse(t));
+        const t = localStorage.getItem(STORAGE_KEYS.TESTIMONIALS);
+        if (t) setTestimonials(JSON.parse(t));
 
-      const m = localStorage.getItem(STORAGE_KEYS.MEDIA);
-      if (m) setMedia(JSON.parse(m));
+        const m = localStorage.getItem(STORAGE_KEYS.MEDIA);
+        if (m) setMedia(JSON.parse(m));
 
-      const s = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-      if (s) setSettings(JSON.parse(s));
-    } catch (e) {
-      console.warn("Could not load from localStorage:", e);
-    } finally {
+        const s = localStorage.getItem(STORAGE_KEYS.SETTINGS);
+        if (s) setSettings(JSON.parse(s));
+
+        const cust = localStorage.getItem(STORAGE_KEYS.CUSTOMERS);
+        if (cust) setCustomers(JSON.parse(cust));
+
+        const adj = localStorage.getItem(STORAGE_KEYS.ADJUSTMENTS);
+        if (adj) setInventoryAdjustments(JSON.parse(adj));
+
+        const role = localStorage.getItem(STORAGE_KEYS.ROLE);
+        if (role) setCurrentRole(role as AdminRole);
+      } catch (e) {
+        console.warn("Could not load from localStorage:", e);
+      }
+
       setIsLoaded(true);
-    }
+    };
 
-    // Attempt live Supabase synchronization
-    fetch("/api/admin/mutate")
-      .then((res) => res.json())
+    queueMicrotask(() => {
+      if (active) hydrateLocal();
+    });
+
+    fetch("/api/admin/sync-supabase")
+      .then((res) => (res.ok ? res.json() : null))
       .then((res) => {
+        if (!active || !res) return;
         if (res.configured && res.data) {
           if (res.data.products?.length > 0) setProducts(res.data.products);
           if (res.data.categories?.length > 0) setCategories(res.data.categories);
           if (res.data.quotes?.length > 0) setQuotes(res.data.quotes);
           if (res.data.inquiries?.length > 0) setInquiries(res.data.inquiries);
-          if (res.data.gallery?.length > 0) setGallery(res.data.gallery);
           if (res.data.partners?.length > 0) setPartners(res.data.partners);
           if (res.data.testimonials?.length > 0) setTestimonials(res.data.testimonials);
+          if (res.data.media?.length > 0) setMedia(res.data.media);
+          if (res.data.settings) setSettings(res.data.settings);
         }
       })
       .catch((err) => console.warn("[Supabase Initial Fetch Note]", err));
+
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const syncSupabase = (entity: string, action: "upsert" | "delete", data?: any, id?: string) => {
+  const syncSupabase = (
+    entity: string,
+    action: "upsert" | "delete",
+    data?: unknown,
+    id?: string
+  ) => {
     fetch("/api/admin/mutate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -375,7 +320,6 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     }).catch((err) => console.warn("[Supabase Mutation Sync Warn]", err));
   };
 
-  // Save to localStorage when state changes
   useEffect(() => {
     if (!isLoaded) return;
     try {
@@ -383,17 +327,31 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
       localStorage.setItem(STORAGE_KEYS.QUOTES, JSON.stringify(quotes));
       localStorage.setItem(STORAGE_KEYS.INQUIRIES, JSON.stringify(inquiries));
-      localStorage.setItem(STORAGE_KEYS.GALLERY, JSON.stringify(gallery));
       localStorage.setItem(STORAGE_KEYS.PARTNERS, JSON.stringify(partners));
       localStorage.setItem(STORAGE_KEYS.TESTIMONIALS, JSON.stringify(testimonials));
       localStorage.setItem(STORAGE_KEYS.MEDIA, JSON.stringify(media));
       localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+      localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(customers));
+      localStorage.setItem(STORAGE_KEYS.ADJUSTMENTS, JSON.stringify(inventoryAdjustments));
+      localStorage.setItem(STORAGE_KEYS.ROLE, currentRole);
     } catch (e) {
       console.warn("Could not save to localStorage:", e);
     }
-  }, [products, categories, quotes, inquiries, gallery, partners, testimonials, media, settings, isLoaded]);
+  }, [
+    products,
+    categories,
+    quotes,
+    inquiries,
+    partners,
+    testimonials,
+    media,
+    settings,
+    customers,
+    inventoryAdjustments,
+    currentRole,
+    isLoaded,
+  ]);
 
-  // Product Actions
   const addProduct = (item: Omit<Product, "id" | "created_at">) => {
     const newProduct: Product = {
       ...item,
@@ -432,43 +390,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     setUndoDeletedProduct(null);
   };
 
-  // Order Actions
-  const updateOrderStatus = (id: string, status: OrderStatus) => {
-    setOrders((prev) => {
-      const updated = prev.map((ord) =>
-        ord.id === id
-          ? {
-              ...ord,
-              status,
-              updated_at: new Date().toISOString(),
-              estimated_delivery:
-                status === "delivered"
-                  ? "Delivered successfully"
-                  : status === "out_for_delivery"
-                  ? "Arriving today by 17:00 EAT"
-                  : ord.estimated_delivery,
-            }
-          : ord
-      );
-      try {
-        localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(updated));
-      } catch {}
-      return updated;
-    });
-  };
-
-  // Customer Actions
   const updateCustomerStatus = (id: string, status: Customer["status"]) => {
-    setCustomers((prev) => {
-      const updated = prev.map((c) => (c.id === id ? { ...c, status } : c));
-      try {
-        localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(updated));
-      } catch {}
-      return updated;
-    });
+    setCustomers((prev) => prev.map((c) => (c.id === id ? { ...c, status } : c)));
   };
 
-  // Inventory Stock Adjustment Actions
   const adjustStock = async (
     productId: string,
     delta: number,
@@ -484,7 +409,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (newQty < 0) {
       return {
         success: false,
-        error: `Negative stock prevented! Current yard balance is ${currentQty} sheets. Delta ${delta} would result in ${newQty}.`,
+        error: `Stock cannot become negative (${currentQty} available, requested delta ${delta}).`,
       };
     }
 
@@ -497,44 +422,26 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         ? "overstocked"
         : "in_stock";
 
-    // Update product in state
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.id === productId
-          ? {
-              ...p,
-              stock_quantity: newQty,
-              stock_status: newStatus,
-            }
-          : p
-      )
-    );
-
-    // Create adjustment log entry
-    const newLog: InventoryAdjustment = {
+    const adjustment: InventoryAdjustment = {
       id: `adj-${Date.now()}`,
       product_id: productId,
-      product_name: `${prod.name} (${prod.specs.thickness.split(",")[0].trim()})`,
+      product_name: prod.name,
       previous_stock: currentQty,
       new_stock: newQty,
       delta,
       reason,
-      adjusted_by: `${currentRole.replace("_", " ")} (Admin)`,
+      adjusted_by: "Admin User",
       notes,
       created_at: new Date().toISOString(),
     };
 
-    setInventoryAdjustments((prev) => [newLog, ...prev]);
-
+    updateProduct(productId, { stock_quantity: newQty, stock_status: newStatus });
+    setInventoryAdjustments((prev) => [adjustment, ...prev]);
     return { success: true };
   };
 
-  // Category Actions
   const addCategory = (cat: Omit<Category, "id">) => {
-    const newCat: Category = {
-      ...cat,
-      id: `cat-${Date.now()}`,
-    };
+    const newCat: Category = { ...cat, id: `cat-${Date.now()}` };
     setCategories((prev) => [...prev, newCat]);
     syncSupabase("category", "upsert", newCat);
   };
@@ -555,16 +462,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     syncSupabase("category", "delete", undefined, id);
   };
 
-  // Quote Actions
-  const updateQuoteStatus = (id: string, status: Quote["status"], notes?: string, amount?: number) => {
+  const updateQuoteStatus = (id: string, status: Quote["status"], notes?: string) => {
     setQuotes((prev) => {
       const updatedList = prev.map((q) =>
         q.id === id
           ? {
               ...q,
               status,
-              ...(notes !== undefined ? { notes } : {}),
-              ...(amount !== undefined ? { amount } : {}),
+              notes: notes !== undefined ? notes : q.notes,
+              sent_at: status === "sent" ? new Date().toISOString() : q.sent_at,
             }
           : q
       );
@@ -579,7 +485,6 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     syncSupabase("quote", "delete", undefined, id);
   };
 
-  // Inquiry Actions
   const updateInquiryStatus = (id: string, status: Inquiry["status"], notes?: string) => {
     setInquiries((prev) => {
       const updatedList = prev.map((inq) =>
@@ -587,7 +492,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
           ? {
               ...inq,
               status,
-              ...(notes !== undefined ? { notes } : {}),
+              notes: notes !== undefined ? notes : inq.notes,
               updated_at: new Date().toISOString(),
             }
           : inq
@@ -603,38 +508,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     syncSupabase("inquiry", "delete", undefined, id);
   };
 
-  // Gallery Actions
-  const addGalleryItem = (item: Omit<GalleryItem, "id" | "created_at">) => {
-    const newItem: GalleryItem = {
-      ...item,
-      id: `gal-${Date.now()}`,
-    };
-    setGallery((prev) => [newItem, ...prev]);
-    syncSupabase("gallery", "upsert", newItem);
-  };
-
-  const updateGalleryItem = (id: string, updates: Partial<GalleryItem>) => {
-    setGallery((prev) => {
-      const updatedList = prev.map((item) =>
-        item.id === id ? { ...item, ...updates } : item
-      );
-      const updatedItem = updatedList.find((i) => i.id === id);
-      if (updatedItem) syncSupabase("gallery", "upsert", updatedItem);
-      return updatedList;
-    });
-  };
-
-  const deleteGalleryItem = (id: string) => {
-    setGallery((prev) => prev.filter((item) => item.id !== id));
-    syncSupabase("gallery", "delete", undefined, id);
-  };
-
-  // Partner Actions
   const addPartner = (item: Omit<Partner, "id">) => {
-    const newPartner: Partner = {
-      ...item,
-      id: `part-${Date.now()}`,
-    };
+    const newPartner: Partner = { ...item, id: `part-${Date.now()}` };
     setPartners((prev) => [...prev, newPartner]);
     syncSupabase("partner", "upsert", newPartner);
   };
@@ -655,13 +530,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     syncSupabase("partner", "delete", undefined, id);
   };
 
-  // Testimonial Actions
   const addTestimonial = (item: Omit<Testimonial, "id">) => {
-    const newTestimonial: Testimonial = {
-      ...item,
-      id: `test-${Date.now()}`,
-    };
-    setTestimonials((prev) => [newTestimonial, ...prev]);
+    const newTestimonial: Testimonial = { ...item, id: `test-${Date.now()}` };
+    setTestimonials((prev) => [...prev, newTestimonial]);
     syncSupabase("testimonial", "upsert", newTestimonial);
   };
 
@@ -681,7 +552,6 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     syncSupabase("testimonial", "delete", undefined, id);
   };
 
-  // Media Actions
   const addMediaAsset = (item: Omit<MediaAsset, "id" | "created_at">) => {
     const newAsset: MediaAsset = {
       ...item,
@@ -697,7 +567,6 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     syncSupabase("media", "delete", undefined, id);
   };
 
-  // Settings Actions
   const updateSettings = (updates: Partial<SiteSettings>) => {
     setSettings((prev) => {
       const newSettings = { ...prev, ...updates };
@@ -711,12 +580,17 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     setCategories(initialCategories);
     setQuotes(seedQuotes);
     setInquiries(seedInquiries);
-    setGallery(initialGallery);
     setPartners(initialPartners);
     setTestimonials(initialTestimonials);
     setMedia(seedMedia);
     setSettings(initialSettings);
-    localStorage.clear();
+    setCustomers(initialCustomers);
+    setInventoryAdjustments(initialAdjustments);
+    Object.values(STORAGE_KEYS).forEach((key) => {
+      try {
+        localStorage.removeItem(key);
+      } catch {}
+    });
   };
 
   return (
@@ -726,34 +600,29 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
         categories,
         quotes,
         inquiries,
-        gallery,
         partners,
         testimonials,
         media,
         settings,
-        orders,
         customers,
         inventoryAdjustments,
         currentRole,
         setCurrentRole,
+        isLoaded,
+        undoDeletedProduct,
         addProduct,
         updateProduct,
         deleteProduct,
-        undoDeletedProduct,
         undoDeleteProduct,
         addCategory,
         updateCategory,
         deleteCategory,
-        updateOrderStatus,
         updateCustomerStatus,
         adjustStock,
         updateQuoteStatus,
         deleteQuote,
         updateInquiryStatus,
         deleteInquiry,
-        addGalleryItem,
-        updateGalleryItem,
-        deleteGalleryItem,
         addPartner,
         updatePartner,
         deletePartner,

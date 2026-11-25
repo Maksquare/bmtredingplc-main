@@ -192,7 +192,7 @@ function LoginForm() {
                 </span>
               </div>
               <p className="text-xs text-white/60 mt-1 font-medium">
-                Central Timber Yard CMS & RFQ Management
+                Safarian &amp; Plywood Management Portal
               </p>
             </div>
           </div>

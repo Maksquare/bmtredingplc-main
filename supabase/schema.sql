@@ -3,7 +3,6 @@
 -- Complete Database Architecture, Row-Level Security, Indexes, and Constraints
 -- ==============================================================================
 
--- Enable UUID extension if not already enabled
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ------------------------------------------------------------------------------
@@ -13,24 +12,24 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     company_name TEXT NOT NULL DEFAULT 'bmtradingplc',
     legal_name TEXT NOT NULL DEFAULT 'bmtradingplc',
-    tagline TEXT DEFAULT 'Architectural Timber & Industrial Plywood Solutions',
+    tagline TEXT DEFAULT 'Safarian Boards & Structural Plywood Solutions',
     description TEXT,
     contact_email TEXT NOT NULL DEFAULT 'info@bmtradingplc.com',
     sales_email TEXT NOT NULL DEFAULT 'sales@bmtradingplc.com',
-    phone TEXT NOT NULL DEFAULT '+251 911 234 567',
-    phone_display TEXT NOT NULL DEFAULT '+251 911 234 567',
-    landline TEXT DEFAULT '+251 11 667 8900',
-    whatsapp TEXT DEFAULT '+251911234567',
-    telegram TEXT DEFAULT 'bmtradingplc',
-    street_address TEXT DEFAULT 'Bole Sub-City, Woreda 03, Industrial Commercial Corridor',
+    phone TEXT NOT NULL DEFAULT '+251911247821',
+    phone_display TEXT NOT NULL DEFAULT '0911 247 821',
+    secondary_phone TEXT DEFAULT '0911 221 261',
+    tertiary_phone TEXT DEFAULT '0910 953 373',
+    whatsapp TEXT DEFAULT '+251911247821',
+    telegram TEXT DEFAULT '+251911247821',
+    street_address TEXT DEFAULT 'Addis Ababa, Ayer Tena, Shamo Tower, 3rd Floor',
+    factory_address TEXT DEFAULT 'Central Ethiopia, Werabe City',
     city TEXT DEFAULT 'Addis Ababa',
     region TEXT DEFAULT 'Addis Ababa',
     country TEXT DEFAULT 'Ethiopia',
-    business_hours TEXT DEFAULT 'Monday – Friday: 08:00 – 17:30 | Saturday: 08:30 – 13:00 (EAT)',
-    years_experience INT DEFAULT 18,
-    metric_tons_delivered INT DEFAULT 120,
-    major_clients_count INT DEFAULT 450,
-    quality_compliance INT DEFAULT 100,
+    business_hours TEXT DEFAULT 'Monday – Saturday: 08:30 – 17:30 (EAT)',
+    years_experience INT DEFAULT 10,
+    major_clients_count INT DEFAULT 200,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -72,7 +71,7 @@ CREATE TABLE IF NOT EXISTS public.products (
 );
 
 -- ------------------------------------------------------------------------------
--- 4. CONTRACTOR QUOTE REQUESTS (RFQs) TABLE
+-- 4. QUOTE REQUESTS (RFQs) TABLE
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.quotes (
     id TEXT PRIMARY KEY,
@@ -87,11 +86,8 @@ CREATE TABLE IF NOT EXISTS public.quotes (
     delivery_type TEXT DEFAULT 'delivery' CHECK (delivery_type IN ('delivery', 'yard_pickup')),
     delivery_address TEXT,
     target_date TEXT,
-    estimated_amount NUMERIC(12, 2),
-    currency TEXT DEFAULT 'ETB',
     status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'reviewing', 'sent', 'accepted', 'declined')),
     internal_notes TEXT,
-    pdf_proforma_url TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -115,29 +111,14 @@ CREATE TABLE IF NOT EXISTS public.inquiries (
 );
 
 -- ------------------------------------------------------------------------------
--- 6. PROJECT GALLERY / SHOWCASE TABLE
--- ------------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS public.gallery_items (
-    id TEXT PRIMARY KEY,
-    title TEXT NOT NULL,
-    project_name TEXT NOT NULL,
-    category TEXT NOT NULL,
-    image_url TEXT NOT NULL,
-    description TEXT,
-    contractor TEXT,
-    order_index INT DEFAULT 0,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- ------------------------------------------------------------------------------
--- 7. PARTNERS & CLIENT ORGANIZATIONS TABLE
+-- 6. PARTNERS & CLIENT ORGANIZATIONS TABLE
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.partners (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     category TEXT NOT NULL,
     initials TEXT NOT NULL,
+    logo_url TEXT,
     website_url TEXT,
     order_index INT DEFAULT 0,
     is_active BOOLEAN DEFAULT TRUE,
@@ -145,7 +126,7 @@ CREATE TABLE IF NOT EXISTS public.partners (
 );
 
 -- ------------------------------------------------------------------------------
--- 8. TESTIMONIALS TABLE
+-- 7. TESTIMONIALS TABLE
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.testimonials (
     id TEXT PRIMARY KEY,
@@ -161,7 +142,7 @@ CREATE TABLE IF NOT EXISTS public.testimonials (
 );
 
 -- ------------------------------------------------------------------------------
--- 9. MEDIA ASSETS TABLE
+-- 8. MEDIA ASSETS TABLE
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.media_assets (
     id TEXT PRIMARY KEY,
@@ -174,7 +155,7 @@ CREATE TABLE IF NOT EXISTS public.media_assets (
 );
 
 -- ------------------------------------------------------------------------------
--- 10. INDEXES FOR HIGH-PERFORMANCE QUERYING (Supabase Postgres Best Practices)
+-- 9. INDEXES FOR HIGH-PERFORMANCE QUERYING
 -- ------------------------------------------------------------------------------
 CREATE INDEX IF NOT EXISTS idx_products_category ON public.products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_slug ON public.products(slug);
@@ -186,50 +167,39 @@ CREATE INDEX IF NOT EXISTS idx_quotes_created_at ON public.quotes(created_at DES
 CREATE INDEX IF NOT EXISTS idx_inquiries_status ON public.inquiries(status);
 CREATE INDEX IF NOT EXISTS idx_inquiries_created_at ON public.inquiries(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_categories_order ON public.categories(order_index);
-CREATE INDEX IF NOT EXISTS idx_gallery_order ON public.gallery_items(order_index);
 
 -- ------------------------------------------------------------------------------
--- 11. ROW-LEVEL SECURITY (RLS) POLICIES
+-- 10. ROW-LEVEL SECURITY (RLS) POLICIES
 -- ------------------------------------------------------------------------------
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.quotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.gallery_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.partners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.testimonials ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.media_assets ENABLE ROW LEVEL SECURITY;
 
--- Public can READ published products, active categories, gallery, partners, testimonials, and settings
 CREATE POLICY "Public Read Settings" ON public.site_settings FOR SELECT USING (true);
 CREATE POLICY "Public Read Categories" ON public.categories FOR SELECT USING (is_active = true);
 CREATE POLICY "Public Read Products" ON public.products FOR SELECT USING (status = 'published');
-CREATE POLICY "Public Read Gallery" ON public.gallery_items FOR SELECT USING (is_active = true);
 CREATE POLICY "Public Read Partners" ON public.partners FOR SELECT USING (is_active = true);
 CREATE POLICY "Public Read Testimonials" ON public.testimonials FOR SELECT USING (is_active = true);
 
--- Public can INSERT quote requests and inquiries
 CREATE POLICY "Public Insert Quotes" ON public.quotes FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public Insert Inquiries" ON public.inquiries FOR INSERT WITH CHECK (true);
 
--- Authenticated Staff/Admin has FULL CRUD permissions on all tables
 CREATE POLICY "Admin Full Access Settings" ON public.site_settings FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Admin Full Access Categories" ON public.categories FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Admin Full Access Products" ON public.products FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Admin Full Access Quotes" ON public.quotes FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Admin Full Access Inquiries" ON public.inquiries FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Admin Full Access Gallery" ON public.gallery_items FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Admin Full Access Partners" ON public.partners FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Admin Full Access Testimonials" ON public.testimonials FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Admin Full Access Media" ON public.media_assets FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
--- ------------------------------------------------------------------------------
--- 12. DATA API ROLE GRANTS (Exposing Tables via PostgREST Data API)
--- ------------------------------------------------------------------------------
 GRANT USAGE ON SCHEMA public TO anon, authenticated;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon;
 GRANT INSERT ON public.quotes, public.inquiries TO anon;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
-

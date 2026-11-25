@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -82,15 +82,15 @@ export default function AdminProductsPage({
     description: "",
     thickness: "18mm",
     standard_size: "1220mm × 2440mm (4ft × 8ft)",
-    grade: "BS 1088 Marine / Calibrated",
-    glue_type: "WBP Phenolic (72-hr Boil Test)",
-    core_species: "100% Solid Gurjan / Keruing Hardwood",
-    surface_finish: "Smooth Sanded (120/240 Grit)",
+    grade: "Structural & Signature Furniture Grade",
+    glue_type: "High-Bond Structural Adhesive",
+    core_species: "Cross-Laminated Dense Hardwood",
+    surface_finish: "Calibrated Smooth Sanded Face",
     density: "680 – 720 kg/m³",
     moisture_content: "8% – 12%",
     formaldehyde_emission: "E0 / CARB Phase 2",
     applications: "High-Rise Concrete Formwork, Structural Slabs",
-    imageUrl: "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?q=80&w=800&auto=format&fit=crop",
+    imageUrl: "/images/products/plywood-18mm-special.jpg",
     is_featured: false,
     status: "published" as Product["status"],
   });
@@ -106,10 +106,10 @@ export default function AdminProductsPage({
       description: "",
       thickness: "18mm, 21mm",
       standard_size: "1220mm × 2440mm (4ft × 8ft)",
-      grade: "BS 1088 Marine / Calibrated",
-      glue_type: "WBP Phenolic (72-hr Boil Test)",
-      core_species: "100% Solid Gurjan / Keruing Hardwood",
-      surface_finish: "Smooth Sanded",
+      grade: "Structural & Signature Furniture Grade",
+      glue_type: "High-Bond Structural Adhesive",
+      core_species: "Cross-Laminated Dense Hardwood",
+      surface_finish: "Calibrated Smooth Sanded Face",
       density: "680 – 720 kg/m³",
       moisture_content: "8% – 12%",
       formaldehyde_emission: "E0 / CARB Phase 2",
@@ -193,7 +193,7 @@ export default function AdminProductsPage({
           setFormData((prev) => ({ ...prev, imageUrl: data.asset.file_url }));
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.warn("Server upload failed, using object URL fallback:", err);
       const fallbackUrl = URL.createObjectURL(file);
       addMediaAsset({
@@ -257,7 +257,7 @@ export default function AdminProductsPage({
     const finalImages =
       allImages.length > 0
         ? allImages
-        : ["https://images.unsplash.com/photo-1541123437800-1bb1317badc2?q=80&w=800&auto=format&fit=crop"];
+        : ["/images/products/plywood-18mm-special.jpg"];
 
     if (editingProduct) {
       updateProduct(editingProduct.id, {
@@ -329,8 +329,8 @@ export default function AdminProductsPage({
           clearInterval(timer);
           setIsImporting(false);
           setImportErrors([
-            "Row 4 (TitanDeck 24mm): Missing glue type specification - fallback to WBP applied.",
-            "Row 9 (VeneerCraft 4mm): Price was negative (-450) - rejected and reset to Price on Request.",
+            "Row 4 (Plywood 16mm): Missing wood core description - default hardwood core applied.",
+            "Row 9 (Safarian 06mm): Stock count cannot be negative (-450) - reset to 0 sheets.",
           ]);
           return 100;
         }
@@ -345,11 +345,11 @@ export default function AdminProductsPage({
       setIsExporting(false);
       const csvContent =
         "data:text/csv;charset=utf-8," +
-        ["ID,Name,Category,Grade,Thickness,Stock,Price"]
+        ["ID,Name,Category,Grade,Thickness,Stock"]
           .concat(
             products.map(
               (p) =>
-                `"${p.id}","${p.name}","${p.category_name}","${p.specs.grade}","${p.specs.thickness}","${p.stock_quantity || 0}","${p.price || 0}"`
+                `"${p.id}","${p.name}","${p.category_name}","${p.specs.grade}","${p.specs.thickness}","${p.stock_quantity || 0}"`
             )
           )
           .join("\n");
@@ -364,22 +364,20 @@ export default function AdminProductsPage({
   };
 
   // Filtered Products
-  const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      const matchSearch =
-        p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.specs.grade.toLowerCase().includes(search.toLowerCase()) ||
-        p.specs.thickness.toLowerCase().includes(search.toLowerCase());
+  const filteredProducts = products.filter((p) => {
+    const matchSearch =
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.specs.grade.toLowerCase().includes(search.toLowerCase()) ||
+      p.specs.thickness.toLowerCase().includes(search.toLowerCase());
 
-      const matchCategory =
-        selectedCategory === "all" || p.category_id === selectedCategory;
+    const matchCategory =
+      selectedCategory === "all" || p.category_id === selectedCategory;
 
-      const matchStatus =
-        selectedStatus === "all" || p.status === selectedStatus;
+    const matchStatus =
+      selectedStatus === "all" || p.status === selectedStatus;
 
-      return matchSearch && matchCategory && matchStatus;
-    });
-  }, [products, search, selectedCategory, selectedStatus]);
+    return matchSearch && matchCategory && matchStatus;
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -426,7 +424,7 @@ export default function AdminProductsPage({
             <Search className="w-4 h-4 text-charcoal-subtle absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
-              placeholder="Search by name, grade, thickness (e.g. 18mm, BS 1088)..."
+              placeholder="Search by name, thickness (e.g. Safarian, 18mm Plywood)..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full h-10 pl-10 pr-4 text-xs sm:text-sm bg-cream-surface/60 rounded-xl border border-cream-border text-charcoal placeholder:text-charcoal-subtle focus:bg-white focus:border-amber-oak focus:outline-none transition-all"
@@ -556,7 +554,7 @@ export default function AdminProductsPage({
               <tbody className="divide-y divide-cream-border/60">
                 {filteredProducts.map((p) => {
                   const cat = categories.find((c) => c.id === p.category_id);
-                  const img = p.images[0] || "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?q=80&w=200";
+                  const img = p.images[0] || "/images/products/plywood-18mm-special.jpg";
                   const isSelected = selectedIds.includes(p.id);
 
                   return (
@@ -756,7 +754,7 @@ export default function AdminProductsPage({
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                placeholder="e.g. ProForm Dynea 18mm Shuttering"
+                placeholder="e.g. Plywood (16mm / 18mm Special Product)"
                 className="w-full h-10 px-3 bg-cream-surface/60 rounded-xl border border-cream-border text-charcoal font-medium focus:bg-white focus:border-amber-oak focus:outline-none"
               />
             </div>
@@ -820,7 +818,7 @@ export default function AdminProductsPage({
                 type="text"
                 value={formData.grade}
                 onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-                placeholder="BS 1088 Marine / B/BB Grade"
+                placeholder="Commercial & Structural Furniture Grade"
                 className="w-full h-10 px-3 bg-cream-surface/60 rounded-xl border border-cream-border text-charcoal font-medium focus:bg-white focus:border-amber-oak focus:outline-none"
               />
             </div>
@@ -856,7 +854,7 @@ export default function AdminProductsPage({
                 type="text"
                 value={formData.surface_finish}
                 onChange={(e) => setFormData({ ...formData, surface_finish: e.target.value })}
-                placeholder="Dynea 120g/m² Phenolic Film or Calibrated Sanded"
+                placeholder="Calibrated Smooth Sanded Face"
                 className="w-full h-10 px-3 bg-cream-surface/60 rounded-xl border border-cream-border text-charcoal font-medium focus:bg-white focus:border-amber-oak focus:outline-none"
               />
             </div>
@@ -1059,7 +1057,7 @@ export default function AdminProductsPage({
                     type="url"
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    placeholder="https://images.unsplash.com/... or CDN link"
+                    placeholder="/images/products/plywood-18mm-special.jpg or CDN link"
                     className="w-full h-10 px-3 bg-white rounded-xl border border-cream-border text-charcoal font-medium focus:border-amber-oak focus:outline-none text-xs"
                   />
                   {formData.imageUrl && (

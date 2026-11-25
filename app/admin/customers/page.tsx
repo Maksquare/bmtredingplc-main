@@ -183,22 +183,22 @@ export default function AdminCustomersPage() {
                     </div>
                   </div>
 
-                  {/* Orders & Volume Metric */}
+                  {/* Client Partner Status Metric (Zero Billing) */}
                   <div className="p-3 rounded-xl bg-cream-surface/60 border border-cream-border/70 grid grid-cols-2 gap-2 text-xs">
                     <div>
                       <span className="text-[10px] uppercase text-charcoal-subtle font-semibold block">
-                        Total Orders
+                        Supply Line
                       </span>
                       <span className="font-display font-extrabold text-charcoal text-sm">
-                        {cust.total_orders} Orders
+                        Safarian &amp; Plywood
                       </span>
                     </div>
                     <div>
                       <span className="text-[10px] uppercase text-charcoal-subtle font-semibold block">
-                        Total Value
+                        Partner Status
                       </span>
-                      <span className="font-display font-extrabold text-forest text-sm">
-                        {cust.total_spend.toLocaleString()} ETB
+                      <span className="font-display font-extrabold text-forest text-sm capitalize">
+                        {cust.status === "returning" ? "Recurring Partner" : cust.status}
                       </span>
                     </div>
                   </div>
@@ -282,8 +282,8 @@ export default function AdminCustomersPage() {
               </h3>
               <p className="text-xs text-charcoal-muted leading-relaxed">
                 {targetCustomer.status === "blocked"
-                  ? `Restore commercial ordering and proforma quotation requests for ${targetCustomer.company}?`
-                  : `Blocking ${targetCustomer.company} will suspend direct yard consignment dispatch and automated proformas.`}
+                  ? `Restore direct supply coordination and quote access for ${targetCustomer.company}?`
+                  : `Blocking ${targetCustomer.company} will suspend new quote processing and dispatch scheduling.`}
               </p>
             </div>
 

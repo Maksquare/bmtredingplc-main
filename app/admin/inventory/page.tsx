@@ -129,7 +129,7 @@ export default function AdminInventoryPage() {
           <span className="font-display font-black text-2xl sm:text-3xl text-forest mt-1 block">
             {totalSheetsInYard.toLocaleString()}
           </span>
-          <span className="text-[10px] text-charcoal-muted mt-0.5 block">Kality Central Depot</span>
+          <span className="text-[10px] text-charcoal-muted mt-0.5 block">Werabe Factory &amp; Addis Stock</span>
         </div>
 
         <div className="bg-white p-4 rounded-2xl border border-cream-border shadow-xs">

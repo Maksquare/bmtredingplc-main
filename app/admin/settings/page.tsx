@@ -36,10 +36,10 @@ export default function SettingsAdminPage() {
     quotes,
     inquiries,
     media,
-    gallery,
   } = useAdminData();
 
-  const [formData, setFormData] = useState<SiteSettings>(settings);
+  const [draftOverrides, setDraftOverrides] = useState<Partial<SiteSettings>>({});
+  const formData: SiteSettings = { ...settings, ...draftOverrides };
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -58,26 +58,25 @@ export default function SettingsAdminPage() {
         success: true,
         message: data.message || "All records synchronized to Supabase PostgreSQL successfully.",
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : "Could not connect to Supabase. Check your environment variables.";
       setSyncFeedback({
         success: false,
-        message: err.message || "Could not connect to Supabase. Check your environment variables.",
+        message: msg,
       });
     } finally {
       setIsSyncing(false);
     }
   };
 
-  // Sync if settings change externally
-  React.useEffect(() => {
-    setFormData(settings);
-  }, [settings]);
-
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setDraftOverrides((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -87,12 +86,14 @@ export default function SettingsAdminPage() {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     updateSettings(formData);
+    setDraftOverrides({});
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
   };
 
   const handleReset = () => {
     resetToDefaults();
+    setDraftOverrides({});
     setIsResetConfirmOpen(false);
     setSaveSuccess(false);
   };
@@ -191,15 +192,15 @@ export default function SettingsAdminPage() {
               <Truck className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-neutral-900 font-display">Central Yard & Physical Address</h3>
-              <p className="text-xs text-neutral-500">Warehouse location, truck loading docks, and operating hours</p>
+              <h3 className="text-base font-bold text-neutral-900 font-display">Office &amp; Factory Locations</h3>
+              <p className="text-xs text-neutral-500">Addis Ababa commercial office and Werabe City manufacturing facility</p>
             </div>
           </div>
 
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-1">
-                Central Importer Yard Address
+                Addis Ababa Office Address
               </label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
@@ -209,6 +210,22 @@ export default function SettingsAdminPage() {
                   value={formData.address}
                   onChange={handleChange}
                   required
+                  className="w-full pl-9 pr-4 py-2 border border-neutral-200 rounded-lg text-sm bg-neutral-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C8832A]/20 focus:border-[#C8832A]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-1">
+                Factory Location
+              </label>
+              <div className="relative">
+                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <input
+                  type="text"
+                  name="factory_address"
+                  value={formData.factory_address || "Central Ethiopia, Werabe City"}
+                  onChange={handleChange}
                   className="w-full pl-9 pr-4 py-2 border border-neutral-200 rounded-lg text-sm bg-neutral-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C8832A]/20 focus:border-[#C8832A]"
                 />
               </div>
@@ -239,7 +256,7 @@ export default function SettingsAdminPage() {
                 <input
                   type="text"
                   readOnly
-                  value="Bole & Kality Logistics Hubs (Flatbed & Crane Loaded)"
+                  value="Addis Ababa Office (Ayer Tena) & Werabe City Factory"
                   className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm bg-neutral-100 text-neutral-600 cursor-not-allowed"
                 />
               </div>
@@ -255,14 +272,14 @@ export default function SettingsAdminPage() {
             </div>
             <div>
               <h3 className="text-base font-bold text-neutral-900 font-display">Sales Hotlines & Direct Channels</h3>
-              <p className="text-xs text-neutral-500">Contractor phone lines, WhatsApp direct chat, and proforma emails</p>
+              <p className="text-xs text-neutral-500">Direct office numbers, WhatsApp, Telegram, and contact emails</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-1">
-                Sales Hotline (Direct Call)
+                Primary Phone (Call / WhatsApp / Telegram)
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
@@ -279,7 +296,39 @@ export default function SettingsAdminPage() {
 
             <div>
               <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-1">
-                WhatsApp Contractor Line
+                Secondary Phone Line
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <input
+                  type="text"
+                  name="secondary_phone"
+                  value={formData.secondary_phone || "0911 221 261"}
+                  onChange={handleChange}
+                  className="w-full pl-9 pr-4 py-2 border border-neutral-200 rounded-lg text-sm bg-neutral-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C8832A]/20 focus:border-[#C8832A]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-1">
+                Third Office Line
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <input
+                  type="text"
+                  name="tertiary_phone"
+                  value={formData.tertiary_phone || "0910 953 373"}
+                  onChange={handleChange}
+                  className="w-full pl-9 pr-4 py-2 border border-neutral-200 rounded-lg text-sm bg-neutral-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C8832A]/20 focus:border-[#C8832A]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-neutral-700 uppercase tracking-wider mb-1">
+                WhatsApp &amp; Telegram Number
               </label>
               <div className="relative">
                 <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
@@ -422,8 +471,8 @@ export default function SettingsAdminPage() {
               <p className="text-xl font-bold text-neutral-900 mt-1">{media.length}</p>
             </div>
             <div className="p-3 bg-neutral-50 rounded-lg border border-neutral-200 text-center">
-              <p className="text-[10px] uppercase font-bold text-neutral-400">Gallery Items</p>
-              <p className="text-xl font-bold text-neutral-900 mt-1">{gallery.length}</p>
+              <p className="text-[10px] uppercase font-bold text-neutral-400">Active Facilities</p>
+              <p className="text-xl font-bold text-neutral-900 mt-1">2 Hubs</p>
             </div>
           </div>
 
@@ -517,7 +566,7 @@ export default function SettingsAdminPage() {
                   <span>cPanel Media &amp; PDF Storage</span>
                 </div>
                 <p className="text-neutral-600 leading-relaxed">
-                  All high-res timber photography, BS 1088 PDF spec sheets, and jobsite gallery assets are stored directly on your cPanel server with 30-day immutable caching.
+                  All Safarian &amp; Plywood photography, catalog PDFs, and factory media assets are stored directly with 30-day caching.
                 </p>
               </div>
 
@@ -537,7 +586,7 @@ export default function SettingsAdminPage() {
         <div className="flex items-center justify-end gap-3 pt-2">
           <button
             type="button"
-            onClick={() => setFormData(settings)}
+            onClick={() => setDraftOverrides({})}
             className="px-4 py-2 rounded-lg border border-neutral-200 text-xs font-semibold text-neutral-600 hover:bg-neutral-100"
           >
             Discard Changes

@@ -51,7 +51,8 @@ export function Reveal({
           scale: 1,
           duration,
           delay,
-          ease: variant === "zoom-in" ? "back.out(1.4)" : "power3.out",
+          immediateRender: false,
+          ease: "power3.out",
           scrollTrigger: {
             trigger: el,
             start: "top 88%",
@@ -106,7 +107,8 @@ export function StaggerContainer({
           scale: 1,
           duration: 0.65,
           stagger: staggerDelay,
-          ease: "power2.out",
+          immediateRender: false,
+          ease: "power3.out",
           scrollTrigger: {
             trigger: el,
             start: "top 86%",

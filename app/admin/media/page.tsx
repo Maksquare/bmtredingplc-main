@@ -105,7 +105,7 @@ export default function MediaAdminPage() {
         }
         setIsUploadModalOpen(false);
         setSelectedFile(null);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.warn("Server upload failed, creating local asset:", err);
         // Fallback: create object URL or direct entry
         const fallbackAsset: Omit<MediaAsset, "id" | "created_at"> = {
@@ -154,7 +154,7 @@ export default function MediaAdminPage() {
             Media & Asset Library
           </h1>
           <p className="text-sm text-neutral-500 mt-1">
-            Store and manage product photographs, BS 1088 spec sheet PDFs, jobsite gallery images, and vector assets.
+            Store and manage Safarian &amp; Plywood product photographs, catalog PDFs, factory images, and brand assets.
           </p>
         </div>
         <button
@@ -244,7 +244,7 @@ export default function MediaAdminPage() {
           {[
             { id: "all", label: "All Assets", count: media.length },
             { id: "products", label: "Products", count: media.filter((m) => m.folder === "products").length },
-            { id: "gallery", label: "Jobsite Gallery", count: media.filter((m) => m.folder === "gallery").length },
+            { id: "gallery", label: "Factory & Showroom", count: media.filter((m) => m.folder === "gallery").length },
             { id: "specs", label: "Spec Sheets & PDFs", count: media.filter((m) => m.folder === "specs").length },
             { id: "brand", label: "Brand & Logos", count: media.filter((m) => m.folder === "brand").length },
             { id: "general", label: "General", count: media.filter((m) => m.folder === "general").length },
@@ -309,7 +309,7 @@ export default function MediaAdminPage() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src =
-                          "https://images.unsplash.com/photo-1546484396-fb3fc6f95f98?q=80&w=600&auto=format&fit=crop";
+                          "/images/products/plywood-18mm-special.jpg";
                       }}
                     />
                   ) : isPdf ? (
@@ -551,7 +551,7 @@ export default function MediaAdminPage() {
                   className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm bg-neutral-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C8832A]/20 focus:border-[#C8832A]"
                 >
                   <option value="products">Products (Plywood & Timber specs)</option>
-                  <option value="gallery">Project Gallery (Jobsite photos)</option>
+                  <option value="gallery">Factory &amp; Showroom Photos</option>
                   <option value="specs">Spec Sheets & Certificates (PDF)</option>
                   <option value="brand">Brand Assets & Logos</option>
                   <option value="general">General Assets</option>
@@ -601,7 +601,7 @@ export default function MediaAdminPage() {
                       type="text"
                       value={nameInput}
                       onChange={(e) => setNameInput(e.target.value)}
-                      placeholder="e.g. proform-dynea-18mm-site-pour.jpg"
+                      placeholder="e.g. plywood-18mm-special-product.jpg"
                       className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm bg-neutral-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C8832A]/20 focus:border-[#C8832A]"
                     />
                   </div>
@@ -613,7 +613,7 @@ export default function MediaAdminPage() {
                       type="url"
                       value={urlInput}
                       onChange={(e) => setUrlInput(e.target.value)}
-                      placeholder="https://images.unsplash.com/... or CDN link"
+                      placeholder="/images/products/plywood-18mm-special.jpg or CDN link"
                       required
                       className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm bg-neutral-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C8832A]/20 focus:border-[#C8832A]"
                     />

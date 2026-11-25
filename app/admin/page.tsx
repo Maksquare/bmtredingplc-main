@@ -6,7 +6,6 @@ import {
   FileText,
   Layers,
   MessageSquare,
-  Images,
   TrendingUp,
   Clock,
   CheckCircle2,
@@ -36,7 +35,7 @@ export default function AdminDashboardPage({
 }: {
   onOpenSidebar?: () => void;
 }) {
-  const { products, categories, quotes, inquiries, gallery, settings, orders } = useAdminData();
+  const { products, categories, quotes, inquiries, partners } = useAdminData();
   const { showToast } = useToast();
 
   const [dateRange, setDateRange] = useState<"month" | "today" | "empty">("month");
@@ -47,15 +46,9 @@ export default function AdminDashboardPage({
 
   const pendingQuotes = quotes.filter((q) => q.status === "pending" || q.status === "reviewing");
   const newInquiries = inquiries.filter((i) => i.status === "new");
-  const pendingOrders = orders.filter((o) => o.status === "new" || o.status === "confirmed");
   const lowStockProducts = products.filter(
     (p) => p.stock_status === "low_stock" || (typeof p.stock_quantity === "number" && p.stock_quantity <= 15 && p.stock_quantity > 0)
   );
-
-  // Calculate estimated pipeline value
-  const totalPipelineValue = quotes
-    .reduce((acc, q) => acc + (q.amount || 0), 0)
-    .toLocaleString();
 
   const handleRefreshData = () => {
     setIsRefreshing(true);
@@ -78,7 +71,7 @@ export default function AdminDashboardPage({
       showToast({
         type: "success",
         title: "Widget Reconnected",
-        message: "Mojo container terminal telemetry synchronized.",
+        message: "Werabe production schedule telemetry synchronized.",
       });
     }, 900);
   };
@@ -150,52 +143,28 @@ export default function AdminDashboardPage({
           </div>
         </div>
 
-        {/* Operational Alerts Bar: Low Stock, Pending Orders, New RFQs */}
-        {(lowStockProducts.length > 0 || pendingOrders.length > 0) && (
+        {/* Operational Alerts Bar: Low Stock */}
+        {lowStockProducts.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {lowStockProducts.length > 0 && (
-              <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-300 flex items-start gap-3 shadow-2xs">
-                <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
-                <div className="space-y-1 flex-1 text-xs">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-amber-900">
-                      Low Stock Alert ({lowStockProducts.length} specifications)
-                    </span>
-                    <Link
-                      href="/admin/inventory"
-                      className="text-[11px] font-bold text-amber-900 underline hover:text-amber-950"
-                    >
-                      Open Inventory →
-                    </Link>
-                  </div>
-                  <p className="text-amber-800 leading-relaxed text-[11px]">
-                    {lowStockProducts.map((p) => `${p.name} (${p.stock_quantity} sheets)`).join(", ")}.
-                  </p>
+            <div className="p-4 rounded-2xl bg-amber-50/80 border border-amber-300 flex items-start gap-3 shadow-2xs">
+              <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+              <div className="space-y-1 flex-1 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-amber-900">
+                    Low Stock Alert ({lowStockProducts.length} specifications)
+                  </span>
+                  <Link
+                    href="/admin/inventory"
+                    className="text-[11px] font-bold text-amber-900 underline hover:text-amber-950"
+                  >
+                    Open Inventory →
+                  </Link>
                 </div>
+                <p className="text-amber-800 leading-relaxed text-[11px]">
+                  {lowStockProducts.map((p) => `${p.name} (${p.stock_quantity} sheets)`).join(", ")}.
+                </p>
               </div>
-            )}
-
-            {pendingOrders.length > 0 && (
-              <div className="p-4 rounded-2xl bg-blue-50/80 border border-blue-300 flex items-start gap-3 shadow-2xs">
-                <Truck className="w-5 h-5 text-blue-700 shrink-0 mt-0.5" />
-                <div className="space-y-1 flex-1 text-xs">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-blue-900">
-                      Pending Consignments ({pendingOrders.length} orders awaiting dispatch)
-                    </span>
-                    <Link
-                      href="/admin/orders"
-                      className="text-[11px] font-bold text-blue-900 underline hover:text-blue-950"
-                    >
-                      Review Shipments →
-                    </Link>
-                  </div>
-                  <p className="text-blue-800 leading-relaxed text-[11px]">
-                    Contractors waiting for waybill clearance and flatbed truck assignment in Kality.
-                  </p>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         )}
 
@@ -206,7 +175,7 @@ export default function AdminDashboardPage({
         {dateRange === "empty" ? (
           <EmptyState
             title="No Commercial Activity in Selected Range"
-            description="No proforma quotations, container intakes, or flatbed dispatches occurred during this simulated period."
+            description="No quote requests or client inquiries occurred during this selected period."
             icon={Calendar}
             badge="0 Transactions"
             primaryAction={{
@@ -239,7 +208,7 @@ export default function AdminDashboardPage({
               )}
             </div>
             <p className="text-xs text-charcoal-muted mt-2">
-              Pipeline Value: <strong className="text-forest font-semibold">{totalPipelineValue} ETB</strong>
+              Queue Status: <strong className="text-forest font-semibold">{quotes.length} Total Requests</strong>
             </p>
           </div>
 
@@ -291,26 +260,26 @@ export default function AdminDashboardPage({
             </p>
           </div>
 
-          {/* 4. Active Project Showcases */}
+          {/* 4. Featured Partner Companies */}
           <div className="bg-white rounded-2xl border border-cream-border/90 p-5 shadow-2xs hover:shadow-md transition-all duration-200">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal-muted">
-                Jobsite Gallery
+                Partner Companies
               </span>
-              <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center">
-                <Images className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-xl bg-amber-oak/10 text-amber-oak flex items-center justify-center">
+                <Building2 className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3 flex items-baseline justify-between">
               <span className="font-display text-3xl font-extrabold text-charcoal">
-                {gallery.length}
+                {partners.length}
               </span>
-              <span className="text-[11px] font-bold text-purple-700 bg-purple-100 px-2 py-0.5 rounded-md">
-                Verified Sites
+              <span className="text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-md">
+                200+ Clients
               </span>
             </div>
             <p className="text-xs text-charcoal-muted mt-2">
-              High-rise cores, bridge formwork & cabinetry
+              MIDROC, Mina, Warit &amp; Classic Furniture
             </p>
           </div>
         </div>
@@ -389,11 +358,6 @@ export default function AdminDashboardPage({
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                          {quote.amount && (
-                            <span className="text-xs font-bold text-forest bg-forest/5 px-2.5 py-1 rounded-lg">
-                              {quote.amount.toLocaleString()} {quote.currency || "ETB"}
-                            </span>
-                          )}
                           <Link
                             href={`/admin/quotes?id=${quote.id}`}
                             className="px-3 py-1.5 rounded-lg bg-cream-surface hover:bg-cream-border text-xs font-bold text-charcoal transition-colors"
@@ -439,13 +403,13 @@ export default function AdminDashboardPage({
                 </Link>
 
                 <Link
-                  href="/admin/gallery"
+                  href="/admin/testimonials"
                   className="p-3 rounded-xl bg-cream-surface hover:bg-cream-border/80 transition-all text-center flex flex-col items-center gap-1.5 group"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-700 flex items-center justify-center group-hover:scale-105 transition-transform">
-                    <Images className="w-4 h-4" />
+                  <div className="w-8 h-8 rounded-lg bg-amber-oak/10 text-amber-oak flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <Building2 className="w-4 h-4" />
                   </div>
-                  <span className="text-xs font-bold text-charcoal">Add Showcase</span>
+                  <span className="text-xs font-bold text-charcoal">Testimonials</span>
                 </Link>
 
                 <Link
@@ -571,7 +535,7 @@ export default function AdminDashboardPage({
                     <span>Widget Connection Timeout</span>
                   </div>
                   <p className="text-[11px] text-red-700 leading-tight">
-                    Mojo dry port container crane telemetry feed temporarily unreachable. Rest of dashboard remains operational.
+                    Werabe factory dispatch schedule feed temporarily unreachable. Rest of dashboard remains operational.
                   </p>
                   <Button
                     variant="outline"
@@ -589,10 +553,10 @@ export default function AdminDashboardPage({
                 <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 space-y-1">
                   <div className="flex items-center gap-1.5 font-bold text-xs text-emerald-900">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Mojo & Modjo Dry Port: Online</span>
+                    <span>Werabe Factory Sync: Online</span>
                   </div>
                   <p className="text-[11px] text-emerald-700">
-                    2 x 40ft containers (AquaShield BS 1088 Marine) cleared customs today.
+                    Safarian (03–12mm) &amp; Plywood (16mm / 18mm Special Product) inventory live.
                   </p>
                 </div>
               )}

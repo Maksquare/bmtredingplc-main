@@ -7,13 +7,14 @@ import { AdminHeader } from "@/components/admin/AdminHeader";
 import { Testimonial } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { PartnerLogoBadge } from "@/components/ui/PartnerLogoBadge";
 
 export default function AdminTestimonialsPage({
   onOpenSidebar,
 }: {
   onOpenSidebar?: () => void;
 }) {
-  const { testimonials, addTestimonial, updateTestimonial, deleteTestimonial } = useAdminData();
+  const { testimonials, partners, addTestimonial, updateTestimonial, deleteTestimonial } = useAdminData();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Testimonial | null>(null);
@@ -24,6 +25,7 @@ export default function AdminTestimonialsPage({
     role: "",
     content: "",
     rating: 5,
+    avatar_url: "",
     project_type: "",
     is_active: true,
   });
@@ -33,10 +35,11 @@ export default function AdminTestimonialsPage({
     setFormData({
       client_name: "",
       company: "",
-      role: "Project Director",
+      role: "Operations Leadership",
       content: "",
       rating: 5,
-      project_type: "Commercial High-Rise Concrete Formwork",
+      avatar_url: "",
+      project_type: "Commercial & Furniture Supply",
       is_active: true,
     });
     setIsModalOpen(true);
@@ -50,6 +53,7 @@ export default function AdminTestimonialsPage({
       role: t.role,
       content: t.content,
       rating: t.rating,
+      avatar_url: t.avatar_url || "",
       project_type: t.project_type || "",
       is_active: t.is_active,
     });
@@ -58,26 +62,21 @@ export default function AdminTestimonialsPage({
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    const payload = {
+      client_name: formData.client_name,
+      company: formData.company,
+      role: formData.role,
+      content: formData.content,
+      rating: Number(formData.rating),
+      avatar_url: formData.avatar_url.trim() || undefined,
+      project_type: formData.project_type,
+      is_active: formData.is_active,
+    };
+
     if (editingItem) {
-      updateTestimonial(editingItem.id, {
-        client_name: formData.client_name,
-        company: formData.company,
-        role: formData.role,
-        content: formData.content,
-        rating: Number(formData.rating),
-        project_type: formData.project_type,
-        is_active: formData.is_active,
-      });
+      updateTestimonial(editingItem.id, payload);
     } else {
-      addTestimonial({
-        client_name: formData.client_name,
-        company: formData.company,
-        role: formData.role,
-        content: formData.content,
-        rating: Number(formData.rating),
-        project_type: formData.project_type,
-        is_active: formData.is_active,
-      });
+      addTestimonial(payload);
     }
     setIsModalOpen(false);
   };
@@ -138,14 +137,26 @@ export default function AdminTestimonialsPage({
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-cream-border/70 flex items-center justify-between">
-                <div>
-                  <h4 className="font-display font-bold text-xs text-charcoal">
-                    {t.client_name}
-                  </h4>
-                  <p className="text-[10px] text-charcoal-muted">
-                    {t.role}, <strong className="text-charcoal">{t.company}</strong>
-                  </p>
+              <div className="pt-3 border-t border-cream-border/70 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <PartnerLogoBadge
+                    logoUrl={
+                      t.avatar_url ||
+                      partners.find(
+                        (p) => p.name.toLowerCase() === t.company.toLowerCase()
+                      )?.logo_url
+                    }
+                    name={t.company}
+                    size="sm"
+                  />
+                  <div className="min-w-0">
+                    <h4 className="font-display font-bold text-xs text-charcoal truncate">
+                      {t.client_name}
+                    </h4>
+                    <p className="text-[10px] text-charcoal-muted truncate">
+                      {t.role}, <strong className="text-charcoal">{t.company}</strong>
+                    </p>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-1.5">
@@ -217,20 +228,38 @@ export default function AdminTestimonialsPage({
                   value={formData.company}
                   onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                   required
-                  placeholder="e.g. Midroc Construction Ethiopia"
+                  placeholder="e.g. MIDROC Investment Group"
                   className="w-full h-10 px-3 bg-cream-surface/60 rounded-xl border border-cream-border text-charcoal font-medium focus:bg-white focus:border-amber-oak focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="font-bold text-charcoal block">Company Logo Image Path / URL</label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="text"
+                  value={formData.avatar_url}
+                  onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
+                  placeholder="/images/partners/midroc.jpg"
+                  className="flex-1 h-10 px-3 bg-cream-surface/60 rounded-xl border border-cream-border text-charcoal font-medium focus:bg-white focus:border-amber-oak focus:outline-none"
+                />
+                <PartnerLogoBadge
+                  logoUrl={formData.avatar_url}
+                  name={formData.company || "Logo"}
+                  size="sm"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="font-bold text-charcoal block">Professional Role</label>
+                <label className="font-bold text-charcoal block">Role / Department</label>
                 <input
                   type="text"
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  placeholder="Project Director / Senior Civil Works Director"
+                  placeholder="Major Developments Division"
                   className="w-full h-10 px-3 bg-cream-surface/60 rounded-xl border border-cream-border text-charcoal font-medium focus:bg-white focus:border-amber-oak focus:outline-none"
                 />
               </div>
@@ -241,7 +270,7 @@ export default function AdminTestimonialsPage({
                   type="text"
                   value={formData.project_type}
                   onChange={(e) => setFormData({ ...formData, project_type: e.target.value })}
-                  placeholder="Commercial High-Rise Concrete Formwork"
+                  placeholder="Commercial & Residential Developments"
                   className="w-full h-10 px-3 bg-cream-surface/60 rounded-xl border border-cream-border text-charcoal font-medium focus:bg-white focus:border-amber-oak focus:outline-none"
                 />
               </div>
@@ -254,7 +283,7 @@ export default function AdminTestimonialsPage({
                 onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                 required
                 rows={4}
-                placeholder="Details of panel pours, boiling water test results, or yard dispatch reliability..."
+                placeholder="Share feedback on 18mm special plywood, Safarian board calibration, and dispatch reliability..."
                 className="w-full p-3 bg-cream-surface/60 rounded-xl border border-cream-border text-charcoal font-medium focus:bg-white focus:border-amber-oak focus:outline-none"
               />
             </div>

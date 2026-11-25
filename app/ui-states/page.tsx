@@ -52,10 +52,10 @@ import {
 import { AutosaveIndicator, AutosaveStatus } from "@/components/ui/AutosaveIndicator";
 import { useToast } from "@/lib/toast-context";
 import { ProductCard } from "@/components/products/ProductCard";
-import { products, orders, customers } from "@/data/seed-data";
+import { products, customers } from "@/data/seed-data";
 import { ProductVariantSelector } from "@/components/products/ProductVariantSelector";
 import { SessionTimeoutModal } from "@/components/system/SessionTimeoutModal";
-import { OrderStatus } from "@/types";
+import { QuoteStatus } from "@/types";
 
 export default function UIStatesShowcasePage() {
   const { showToast } = useToast();
@@ -66,7 +66,7 @@ export default function UIStatesShowcasePage() {
 
   // Tab 1: Catalog States
   const [catalogState, setCatalogState] = useState<"populated" | "loading" | "empty" | "error">("populated");
-  const [filterChipsGrade, setFilterChipsGrade] = useState("BS 1088");
+  const [filterChipsGrade, setFilterChipsGrade] = useState("Safarian");
   const [filterChipsThick, setFilterChipsThick] = useState("18mm");
 
   // Tab 2: Forms & File Upload States
@@ -78,9 +78,8 @@ export default function UIStatesShowcasePage() {
   const [testMessage, setTestMessage] = useState("");
   const [autosaveState, setAutosaveState] = useState<AutosaveStatus>("saved");
 
-  // Tab 3: Admin, Inventory & Order Lifecycle
-  const [demoOrderStatus, setDemoOrderStatus] = useState<OrderStatus>("dispatched");
-  const [isInvoiceGenerating, setIsInvoiceGenerating] = useState(false);
+  // Tab 3: Admin, Inventory & Quote Lifecycle
+  const [demoQuoteStatus, setDemoQuoteStatus] = useState<QuoteStatus>("sent");
   const [adminRole, setAdminRole] = useState<"super_admin" | "manager" | "staff" | "viewer">("super_admin");
   const [stockDelta, setStockDelta] = useState<number>(-15);
   const [stockBalance, setStockBalance] = useState<number>(45);
@@ -291,21 +290,35 @@ export default function UIStatesShowcasePage() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {/* Card 1: Normal In-Stock with Price */}
+                  {/* Card 1: Normal In-Stock */}
                   <ProductCard product={products[0]} />
 
-                  {/* Card 2: Low Stock Alert ("Only 12 sheets left") */}
-                  <ProductCard product={products[1]} />
+                  {/* Card 2: Plywood 18mm Special Product Low Stock Demo */}
+                  <ProductCard
+                    product={{
+                      ...products[1],
+                      id: "demo-low-stock",
+                      stock_status: "low_stock",
+                      stock_quantity: 12,
+                    }}
+                  />
 
-                  {/* Card 3: Out of Stock ("Request Quote" / "Notify Restock") */}
-                  <ProductCard product={products[3]} />
+                  {/* Card 3: Out of Stock Demo */}
+                  <ProductCard
+                    product={{
+                      ...products[0],
+                      id: "demo-out-of-stock",
+                      stock_status: "out_of_stock",
+                      stock_quantity: 0,
+                    }}
+                  />
                 </div>
 
                 {/* End of List State */}
                 <div className="text-center py-4 border-t border-cream-border/60">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cream-surface/70 border border-cream-border text-xs text-charcoal-muted">
                     <Check className="w-3.5 h-3.5 text-forest" />
-                    <span>All specifications loaded (End of catalog • 7 products)</span>
+                    <span>All specifications loaded (Safarian &amp; Plywood)</span>
                   </span>
                 </div>
               </div>
@@ -313,8 +326,8 @@ export default function UIStatesShowcasePage() {
 
             {catalogState === "empty" && (
               <EmptyState
-                title="No Matching Plywood Panels Found"
-                description="No certified panels match your chosen combination of thickness and grade in our Addis Ababa inventory. Clear filters or submit a custom cutting list."
+                title="No Matching Boards Found"
+                description="No Safarian or Plywood sheets match your selected filters. Clear filters to view our full 03mm–18mm lineup."
                 icon={Layers}
                 badge="0 Results"
                 primaryAction={{
@@ -322,7 +335,7 @@ export default function UIStatesShowcasePage() {
                   onClick: () => setCatalogState("populated"),
                 }}
                 secondaryAction={{
-                  label: "Request Custom Yard Sawing",
+                  label: "Request Quote",
                   href: "/quote",
                 }}
               />
@@ -330,8 +343,8 @@ export default function UIStatesShowcasePage() {
 
             {catalogState === "error" && (
               <ErrorState
-                title="Warehouse Inventory Synchronization Error"
-                message="Unable to reach the Addis Ababa central depot database. Your connection will retry automatically."
+                title="Catalog Synchronization Error"
+                message="Unable to reach the Werabe & Addis Ababa stock feed right now. Retry below."
                 onRetry={() => {
                   return new Promise((res) => {
                     setTimeout(() => {
@@ -352,10 +365,10 @@ export default function UIStatesShowcasePage() {
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-cream-border space-y-4 shadow-xs">
               <div className="space-y-1">
                 <h3 className="font-display font-bold text-lg text-charcoal">
-                  Interactive Variant Selector (Thickness, Size, Stock, and Price)
+                  Interactive Variant Selector (Thickness, Size, and Stock)
                 </h3>
                 <p className="text-xs text-charcoal-muted">
-                  Test interactive thickness switching, real-time yard stock feedback (In Stock, Low Stock, Unavailable), dynamic pricing, and Request Quote:
+                  Test interactive thickness switching, stock availability feedback (In Stock, Low Stock), sheet count selector, and Request Quote:
                 </p>
               </div>
 
@@ -399,7 +412,7 @@ export default function UIStatesShowcasePage() {
                     error={testEmailError}
                     showValidCheck
                     isValid={Boolean(testEmail && !testEmailError && testEmail.includes("@"))}
-                    helperText="Proforma estimates are sent to corporate domains."
+                    helperText="Quote updates are sent to your business email address."
                   />
 
                   <Textarea
@@ -540,7 +553,7 @@ export default function UIStatesShowcasePage() {
                 {[
                   { id: "super_admin", label: "Super Admin (Full)" },
                   { id: "manager", label: "Manager (No Delete)" },
-                  { id: "staff", label: "Yard Staff (Orders Only)" },
+                  { id: "staff", label: "Sales Staff (Quotes Only)" },
                   { id: "viewer", label: "Viewer (Read-Only)" },
                 ].map((r) => (
                   <button
@@ -558,57 +571,57 @@ export default function UIStatesShowcasePage() {
               </div>
             </div>
 
-            {/* Wholesale Order Status Flow & Payment States */}
+            {/* Quote Request Status Flow (Zero Billing) */}
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-cream-border space-y-6 shadow-xs">
               <div className="border-b border-cream-border/60 pb-4">
                 <h3 className="font-display font-bold text-xl text-charcoal">
-                  Commercial Consignment Order &amp; Proforma Lifecycle
+                  Quote &amp; Supply Request Lifecycle
                 </h3>
                 <p className="text-xs text-charcoal-muted">
-                  Full status progression managed by dispatch staff: Placed → Confirmed → Packed → Dispatched → Out for Delivery → Delivered (or Cancelled/Refunded).
+                  Status progression managed by coordination staff: Pending → In Review → Response Sent → Confirmed / Scheduled (or Declined).
                 </p>
               </div>
 
               {/* Status Flow Stepper */}
               <div className="space-y-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal-subtle block">
-                  Simulate Order Status Progression:
+                  Simulate Quote Status Progression:
                 </span>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-                  {(["new", "confirmed", "packed", "dispatched", "out_for_delivery", "delivered"] as OrderStatus[]).map((st) => (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                  {(["pending", "reviewing", "sent", "accepted", "declined"] as QuoteStatus[]).map((st) => (
                     <button
                       key={st}
                       type="button"
-                      onClick={() => setDemoOrderStatus(st)}
+                      onClick={() => setDemoQuoteStatus(st)}
                       className={`p-3 rounded-xl border text-xs font-bold capitalize transition-all cursor-pointer ${
-                        demoOrderStatus === st
+                        demoQuoteStatus === st
                           ? "bg-forest text-white border-forest shadow-xs"
                           : "bg-cream-surface/70 text-charcoal-muted hover:text-charcoal hover:bg-cream-surface border-cream-border"
                       }`}
                     >
-                      {st.replace("_", " ")}
+                      {st}
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Payment Status Badges Showcase */}
+              {/* Quote Response Status Matrix */}
               <div className="p-4 rounded-2xl bg-cream-surface/60 border border-cream-border space-y-3">
                 <span className="text-xs font-bold text-charcoal block">
-                  Payment Status States Matrix:
+                  Quote Coordination Statuses:
                 </span>
                 <div className="flex flex-wrap gap-2 text-xs">
                   <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-300">
-                    Paid (Letter of Credit / Wire Confirmed)
+                    Confirmed (Scheduled for Werabe / Addis Pickup)
                   </span>
                   <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 font-bold border border-amber-300">
-                    Unpaid (Awaiting Commercial Proforma Remittance)
+                    Pending Review (Awaiting Stock Verification)
                   </span>
                   <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-800 font-bold border border-purple-300">
-                    Partial (50% Milestone Advance Paid)
+                    Response Sent (Call / WhatsApp / Email Follow-up)
                   </span>
                   <span className="px-3 py-1 rounded-full bg-red-100 text-red-800 font-bold border border-red-300">
-                    Refunded / Cancelled Order
+                    Declined / Cancelled Request
                   </span>
                 </div>
               </div>
@@ -693,7 +706,7 @@ export default function UIStatesShowcasePage() {
                   <div className="flex items-center gap-2 text-xs font-semibold">
                     <RotateCw className="w-4 h-4 text-amber-700 animate-spin" />
                     <span>
-                      Specification &ldquo;<strong>AquaShield BS 1088 Marine Plywood</strong>&rdquo; was deleted from inventory.
+                      Specification &ldquo;<strong>Plywood 18mm Special Product</strong>&rdquo; was deleted from inventory.
                     </span>
                   </div>
                   <button
@@ -703,7 +716,7 @@ export default function UIStatesShowcasePage() {
                       showToast({
                         type: "success",
                         title: "Specification Restored",
-                        message: "AquaShield BS 1088 has been restored to catalog.",
+                        message: "Plywood 18mm Special Product has been restored to catalog.",
                       });
                     }}
                     className="px-3 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors cursor-pointer"
@@ -743,7 +756,7 @@ export default function UIStatesShowcasePage() {
                   </div>
                   <h4 className="font-bold text-sm text-charcoal">Missing Spec Page</h4>
                   <p className="text-[11px] text-charcoal-muted">
-                    Equipped with in-page live search and popular certified timber chips.
+                    Equipped with in-page live search and Safarian &amp; Plywood quick links.
                   </p>
                 </Link>
 

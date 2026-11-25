@@ -23,7 +23,7 @@ export default function AdminCategoriesPage({
     name: "",
     slug: "",
     description: "",
-    image_url: "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?q=80&w=800",
+    image_url: "/images/products/plywood-18mm-special.jpg",
     order_index: 0,
     is_active: true,
   });
@@ -34,7 +34,7 @@ export default function AdminCategoriesPage({
       name: "",
       slug: "",
       description: "",
-      image_url: "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?q=80&w=800",
+      image_url: "/images/products/plywood-18mm-special.jpg",
       order_index: categories.length + 1,
       is_active: true,
     });
@@ -118,7 +118,7 @@ export default function AdminCategoriesPage({
                   {/* Category Image Preview */}
                   <div className="relative aspect-[16/9] w-full bg-charcoal">
                     <Image
-                      src={cat.image_url || "https://images.unsplash.com/photo-1541123437800-1bb1317badc2?q=80&w=600"}
+                      src={cat.image_url || "/images/products/plywood-18mm-special.jpg"}
                       alt={cat.name}
                       fill
                       sizes="350px"
@@ -216,7 +216,7 @@ export default function AdminCategoriesPage({
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                placeholder="e.g. Marine Plywood (BS 1088)"
+                placeholder="e.g. Safarian or Structural Plywood"
                 className="w-full h-10 px-3 bg-cream-surface/60 rounded-xl border border-cream-border text-charcoal font-medium focus:bg-white focus:border-amber-oak focus:outline-none"
               />
             </div>
