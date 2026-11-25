@@ -1,86 +1,79 @@
 import React from "react";
-import { Star, Quote, CheckCircle2 } from "lucide-react";
-import { testimonials } from "@/data/seed-data";
-import { Section } from "@/components/ui/Section";
+import { Star, Quote } from "lucide-react";
+import { testimonials, partners } from "@/data/seed-data";
 import { Container } from "@/components/ui/Container";
-import { Reveal, StaggerContainer, StaggerItem } from "@/components/ui/Reveal";
+import { PartnerLogoBadge } from "@/components/ui/PartnerLogoBadge";
 
 export function Testimonials() {
   return (
-    <Section variant="cream" woodgrain padded="default" className="py-12 sm:py-16 lg:py-20">
+    <section className="py-16 sm:py-24 bg-white border-t border-[#E5DEC9]/70">
       <Container size="wide">
-        {/* Header */}
-        <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-2.5">
-          <Reveal variant="fade-up">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-oak bg-white px-3 py-1 rounded-full border border-cream-border/90 shadow-2xs">
-              Client References
-            </span>
-          </Reveal>
-          <Reveal variant="fade-up" delay={0.1}>
-            <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-charcoal">
-              Trusted by Civil Engineers & Commercial Millworkers
-            </h2>
-          </Reveal>
-          <Reveal variant="fade-up" delay={0.2}>
-            <p className="text-sm sm:text-base text-charcoal-muted leading-relaxed">
-              Read how our panel calibration, zero-void core construction, and reliable Addis Ababa dispatch support major projects.
-            </p>
-          </Reveal>
+        {/* Centered Header (Inspo 00:20–00:22) */}
+        <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-14 space-y-3">
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-[-0.03em] text-[#141715]">
+            What Our Clients Say
+          </h2>
+          <p className="text-sm sm:text-base text-[#3D4A43] leading-relaxed">
+            Trusted by leading construction groups and furniture workshops across Ethiopia for dependable Safarian and Plywood supply.
+          </p>
         </div>
 
-        {/* Testimonials Grid */}
-        <StaggerContainer
-          staggerDelay={0.1}
-          className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {testimonials.map((test) => (
-            <StaggerItem key={test.id}>
-              <div className="bg-white rounded-xl sm:rounded-2xl border border-cream-border/90 p-5 sm:p-7 h-full flex flex-col justify-between shadow-2xs hover:shadow-lg hover:border-amber-oak/50 transition-all duration-300 hover:-translate-y-1 relative group">
-                <div className="space-y-3.5">
-                  {/* Rating Stars and Quote Icon */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-amber-500">
-                      {[...Array(test.rating)].map((_, i) => (
-                        <Star key={i} className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                      ))}
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-cream-surface flex items-center justify-center text-charcoal-subtle group-hover:text-amber-oak group-hover:bg-amber-pale transition-colors duration-200">
-                      <Quote className="w-4 h-4 opacity-70" />
-                    </div>
+            <div
+              key={test.id}
+              className="bg-[#FCFBF8] rounded-3xl border border-[#E5DEC9] p-6 sm:p-8 flex flex-col justify-between shadow-2xs hover:shadow-xl hover:bg-white hover:border-[#C8832A]/50 transition-all duration-300 hover:-translate-y-1 group"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1 text-[#C8832A]">
+                    {[...Array(test.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-[#C8832A] text-[#C8832A]" />
+                    ))}
                   </div>
+                  <Quote className="w-5 h-5 text-[#D8CFC0] group-hover:text-[#C8832A] transition-colors" />
+                </div>
 
-                  {/* Project Tag */}
-                  {test.project_type && (
-                    <span className="inline-block text-[10px] font-semibold text-forest bg-forest/5 px-2.5 py-1 rounded-md border border-forest/10">
-                      {test.project_type}
-                    </span>
-                  )}
+                {test.project_type && (
+                  <span className="inline-block text-[11px] font-bold text-[#0B241B] bg-[#F4EFE6] px-3 py-1 rounded-full">
+                    {test.project_type}
+                  </span>
+                )}
 
-                  {/* Content */}
-                  <p className="text-xs sm:text-sm text-charcoal-muted leading-relaxed">
-                    &ldquo;{test.content}&rdquo;
+                <p className="text-sm text-[#2D332F] leading-relaxed">
+                  &ldquo;{test.content}&rdquo;
+                </p>
+              </div>
+
+              <div className="pt-5 mt-6 border-t border-[#E5DEC9]/80 flex items-center gap-3.5">
+                <PartnerLogoBadge
+                  logoUrl={
+                    test.avatar_url ||
+                    partners.find(
+                      (p) => p.name.toLowerCase() === test.company.toLowerCase()
+                    )?.logo_url
+                  }
+                  name={test.company}
+                  initials={test.company
+                    .split(" ")
+                    .map((w) => w[0])
+                    .slice(0, 2)
+                    .join("")}
+                  size="md"
+                />
+                <div className="min-w-0">
+                  <h3 className="font-display font-bold text-sm text-[#141715] truncate">
+                    {test.company}
+                  </h3>
+                  <p className="text-[11px] text-[#5A6961] leading-snug">
+                    {test.client_name} • {test.role}
                   </p>
                 </div>
-
-                {/* Author Info */}
-                <div className="pt-4 mt-4 border-t border-cream-border/60 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-forest text-amber-300 font-display font-bold flex items-center justify-center text-xs shrink-0 shadow-2xs">
-                    {test.client_name[0]}
-                  </div>
-                  <div>
-                    <h4 className="font-display font-bold text-xs sm:text-sm text-charcoal">
-                      {test.client_name}
-                    </h4>
-                    <p className="text-[11px] text-charcoal-muted">
-                      {test.role}, <strong className="text-charcoal font-medium">{test.company}</strong>
-                    </p>
-                  </div>
-                </div>
               </div>
-            </StaggerItem>
+            </div>
           ))}
-        </StaggerContainer>
+        </div>
       </Container>
-    </Section>
+    </section>
   );
 }

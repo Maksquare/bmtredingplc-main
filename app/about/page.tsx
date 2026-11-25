@@ -2,290 +2,278 @@ import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ShieldCheck,
-  Target,
-  Award,
+  MapPin,
+  Factory,
   Layers,
+  Award,
   CheckCircle2,
-  Users,
-  Compass,
   ArrowRight,
+  Phone,
+  Clock,
+  Users,
 } from "lucide-react";
 import { siteConfig } from "@/lib/siteConfig";
-import { teamMembers } from "@/data/seed-data";
+import { partners } from "@/data/seed-data";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { Reveal, StaggerContainer, StaggerItem } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
+import { PartnerLogoBadge } from "@/components/ui/PartnerLogoBadge";
 
 export const metadata: Metadata = {
-  title: "About Us | Industrial Timber Excellence in Ethiopia",
-  description: `Learn about ${siteConfig.name}, our history of importing certified BS 1088 marine plywood, high-cycle film-faced shuttering panels, and architectural hardwoods in Addis Ababa, Ethiopia.`,
+  title: "About Us",
+  description: `Learn about ${siteConfig.name} — over 10 years of experience supplying Safarian boards (03mm, 06mm, 08mm, 12mm) and Plywood (16mm and 18mm special product) to 200+ clients from our Werabe factory and Addis Ababa office.`,
+  alternates: {
+    canonical: `${siteConfig.url}/about`,
+  },
 };
 
+const milestones = [
+  {
+    step: "01",
+    title: "Foundation & Industrial Vision",
+    desc: "Founded over a decade ago to provide Ethiopian furniture manufacturers and commercial builders with a steady, dependable supply of wood-based sheet panels.",
+  },
+  {
+    step: "02",
+    title: "Werabe Manufacturing Facility",
+    desc: "Established production operations in Central Ethiopia, Werabe City, creating a reliable domestic manufacturing base for consistent Safarian and Plywood sheet output.",
+  },
+  {
+    step: "03",
+    title: "Flagship 18mm Special Plywood",
+    desc: "Expanded our core catalog around focused, high-demand thicknesses — Safarian in 03mm, 06mm, 08mm, and 12mm alongside Plywood in 16mm and our signature 18mm special product.",
+  },
+  {
+    step: "04",
+    title: "200+ Clients & Leading Partners",
+    desc: "Today we proudly serve over 200 clients nationwide — including MIDROC Investment Group, Mina Furniture, Warit Furniture, and Classic Furniture — from our Ayer Tena, Addis Ababa office.",
+  },
+];
+
+const values = [
+  {
+    icon: Layers,
+    title: "Focused Product Lineup",
+    desc: "Instead of overcomplicating stock, we concentrate on perfecting Safarian boards (03mm, 06mm, 08mm, 12mm) and structural Plywood (16mm and 18mm special product) so every thickness is ready for active orders.",
+  },
+  {
+    icon: Factory,
+    title: "Werabe Factory Production",
+    desc: "Manufacturing in Werabe City, Central Ethiopia allows close oversight of sheet pressing, thickness uniformity, and dependable bulk volume allocation for recurring commercial partners.",
+  },
+  {
+    icon: MapPin,
+    title: "Addis Ababa Sales Coordination",
+    desc: "Our commercial office at Ayer Tena, Shamo Tower, 3rd Floor in Addis Ababa provides fast communication, order scheduling, and direct client service via phone, WhatsApp, and Telegram.",
+  },
+];
+
 export default function AboutPage() {
-  const timeline = [
-    {
-      year: "2008",
-      title: "Founding & Timber Import Licensing",
-      description: `${siteConfig.name} was established with a clear mandate: supplying certified, zero-defect timber products directly to Ethiopia's expanding commercial infrastructure and building sectors.`,
-    },
-    {
-      year: "2013",
-      title: "BS 1088 Marine Certification Standard",
-      description:
-        "Secured verified direct import channels for authentic boiling-water-proof (WBP) Gurjan core marine plywood, meeting international laboratory specifications.",
-    },
-    {
-      year: "2017",
-      title: "Introduction of Dynea Phenolic Shuttering",
-      description:
-        "Pioneered the wholesale distribution of 120g/m² Dynea film-faced plywood across Addis Ababa civil construction, achieving 25+ concrete pour cycles for major builders.",
-    },
-    {
-      year: "2021",
-      title: "Central Logistics Hub & Direct Fleet",
-      description:
-        "Expanded our central industrial warehousing with dedicated flatbed logistics and crane offloading coordination for same-day jobsite delivery.",
-    },
-    {
-      year: "2026",
-      title: "Market Leadership & Quality Benchmark",
-      description:
-        "Over 120,000 metric tons supplied across 450+ commercial high-rises, civil bridge decks, and luxury architectural hospitality projects in Ethiopia.",
-    },
-  ];
-
-  const values = [
-    {
-      icon: ShieldCheck,
-      title: "Material Integrity Guarantee",
-      description:
-        "We reject unseasoned core veneers, hollow internal pockets, and fraudulent grading. Every panel supplied meets certified international specifications.",
-    },
-    {
-      icon: Target,
-      title: "Supply Chain Continuity",
-      description:
-        "Contractors cannot afford concrete delays. We maintain substantial warehouse buffer stock in Addis Ababa to guarantee continuous pour schedules.",
-    },
-    {
-      icon: Compass,
-      title: "Certified Mill Sources",
-      description:
-        "We partner directly with sustainably managed timber concessions conforming to FSC forestry standards, protecting natural forest biodiversity.",
-    },
-    {
-      icon: Award,
-      title: "Technical Engineering Support",
-      description:
-        "Our materials specialists work directly with civil engineers, quantity surveyors, and joinery estimators to match the exact adhesive, core species, and tolerance.",
-    },
-  ];
-
   return (
     <>
       <Navbar />
-      <main className="flex-grow">
-        {/* Page Hero Header */}
-        <div className="bg-[#071711] text-white py-12 sm:py-16 lg:py-20 border-b border-white/15 relative overflow-hidden">
+
+      <main id="main-content" className="flex-1 bg-cream">
+        {/* Hero */}
+        <section className="relative bg-forest-dark text-cream py-20 lg:py-28 overflow-hidden bg-dark-grain border-b border-forest-light/30">
+          <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-amber-oak/15 rounded-full blur-3xl pointer-events-none" />
           <Container size="wide" className="relative z-10">
-            <div className="max-w-3xl space-y-3.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300 bg-white/10 px-3 py-1 rounded-full border border-white/20 inline-block shadow-2xs">
-                About Our Corporation
-              </span>
-              <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
-                Architectural Timber & Plywood Engineered for Enduring Strength.
+            <Reveal variant="fade-up" className="max-w-3xl space-y-6">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-forest-surface border border-forest-light/40 text-xs font-bold tracking-widest uppercase text-amber-light">
+                <Award className="w-3.5 h-3.5 text-amber-light" />
+                <span>About {siteConfig.name} • 10+ Years in Ethiopia</span>
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-display font-extrabold text-white tracking-tight leading-tight">
+                Reliable Safarian &amp; Plywood Supply Built Over 10+ Years.
               </h1>
-              <p className="text-sm sm:text-base text-white/85 leading-relaxed max-w-2xl">
-                For nearly two decades, <strong className="text-white font-semibold">{siteConfig.name}</strong> has provided verified structural panel supply, technical consultation, and unwavering delivery reliability across Ethiopia.
+              <p className="text-base sm:text-lg text-cream/80 leading-relaxed max-w-2xl">
+                {siteConfig.name} combines manufacturing operations in Central Ethiopia, Werabe City with commercial coordination in Addis Ababa (Ayer Tena, Shamo Tower, 3rd Floor) — serving 200+ furniture workshops, contractors, and enterprises nationwide.
               </p>
-            </div>
-          </Container>
-        </div>
-
-        {/* Company Story & Purpose */}
-        <Section variant="cream" woodgrain padded="default" className="py-12 sm:py-16 lg:py-20">
-          <Container size="wide">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-              <div className="lg:col-span-7 space-y-5">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-amber-oak bg-white px-3 py-1 rounded-full border border-cream-border/90 shadow-2xs">
-                  Background & Standards
-                </span>
-                <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-charcoal tracking-tight">
-                  Direct Mill Sourcing for Commercial & Civil Contractors
-                </h2>
-                <div className="space-y-3.5 text-xs sm:text-sm text-charcoal-muted leading-relaxed">
-                  <p>
-                    Established in 2008, <strong className="text-charcoal font-semibold">{siteConfig.name}</strong> solved a critical quality issue in the regional construction sector: the prevalence of uncalibrated, void-ridden plywood incorrectly marketed as waterproof.
-                  </p>
-                  <p>
-                    By establishing direct, verified relationships with premier timber mills worldwide, we enforce strict laboratory testing for core void tolerances, boiling water resistance (WBP phenolic testing), and calibrated thickness gauge before any consignment reaches our distribution yards.
-                  </p>
-                  <p>
-                    Today, our panels form the concrete structures of Addis Ababa high-rises, civil bridge decks, and bespoke architectural millwork for leading commercial builders.
-                  </p>
-                </div>
-
-                <div className="pt-2 flex flex-wrap gap-3">
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-forest bg-white px-3 py-2 rounded-xl border border-cream-border/90 shadow-2xs">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>18+ Years Operating Track Record</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-forest bg-white px-3 py-2 rounded-xl border border-cream-border/90 shadow-2xs">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Direct Primary Importer</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Mission / Vision Cards */}
-              <div className="lg:col-span-5 space-y-4">
-                <div className="bg-[#0B241B] text-white p-6 sm:p-7 rounded-2xl border border-white/15 shadow-lg space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center">
-                    <Target className="w-5 h-5" />
-                  </div>
-                  <h3 className="font-display text-xl font-bold text-white">
-                    Our Mission
-                  </h3>
-                  <p className="text-xs sm:text-sm text-white/80 leading-relaxed">
-                    To deliver zero-defect timber and engineered panels that maximize structural performance, elevate architectural finish quality, and empower contractors with dependable timelines.
-                  </p>
-                </div>
-
-                <div className="bg-white p-6 sm:p-7 rounded-2xl border border-cream-border/90 shadow-xs space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-cream-surface text-forest flex items-center justify-center">
-                    <Compass className="w-5 h-5" />
-                  </div>
-                  <h3 className="font-display text-xl font-bold text-charcoal">
-                    Our Vision
-                  </h3>
-                  <p className="text-xs sm:text-sm text-charcoal-muted leading-relaxed">
-                    To remain the most trusted timber supply partner in Ethiopia, recognized for rigorous standards compliance, transparent wholesale pricing, and exceptional customer service.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Container>
-        </Section>
-
-        {/* Core Values */}
-        <Section variant="cream-surface" padded="default" className="py-12 sm:py-16 lg:py-20 border-y border-cream-border/70">
-          <Container size="wide">
-            <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-2.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-oak bg-white px-3 py-1 rounded-full border border-cream-border/90 shadow-2xs">
-                Operating Principles
-              </span>
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-charcoal">
-                Core Standards Behind Every Shipment
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {values.map((val, idx) => {
-                const Icon = val.icon;
-                return (
-                  <div
-                    key={idx}
-                    className="bg-white rounded-xl sm:rounded-2xl border border-cream-border/90 p-5 sm:p-6 shadow-2xs hover:shadow-lg transition-all duration-300 hover:-translate-y-1 space-y-3 group"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-forest/5 text-amber-oak group-hover:bg-amber-pale flex items-center justify-center transition-colors duration-200">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <h3 className="font-display text-base font-bold text-charcoal group-hover:text-forest transition-colors">
-                      {val.title}
-                    </h3>
-                    <p className="text-xs text-charcoal-muted leading-relaxed">
-                      {val.description}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </Container>
-        </Section>
-
-        {/* Company Timeline */}
-        <Section variant="cream" woodgrain padded="default" className="py-12 sm:py-16 lg:py-20">
-          <Container size="wide">
-            <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-2.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-oak bg-white px-3 py-1 rounded-full border border-cream-border/90 shadow-2xs">
-                Milestones & Growth
-              </span>
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-charcoal">
-                Eighteen Years of Reliability
-              </h2>
-            </div>
-
-            <div className="max-w-3xl mx-auto relative">
-              <div className="absolute left-4 sm:left-1/2 top-0 bottom-0 w-0.5 bg-cream-border/80 -translate-x-1/2" />
-
-              <div className="space-y-6 sm:space-y-8">
-                {timeline.map((item, index) => (
-                  <div
-                    key={index}
-                    className={`relative flex flex-col sm:flex-row items-start ${
-                      index % 2 === 0 ? "sm:flex-row-reverse" : ""
-                    } gap-4 sm:gap-8`}
-                  >
-                    {/* Marker Pin */}
-                    <div className="absolute left-4 sm:left-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-[#0B241B] text-amber-300 font-display font-bold text-xs flex items-center justify-center border-4 border-cream shadow-sm z-10">
-                      {index + 1}
-                    </div>
-
-                    {/* Content Box */}
-                    <div className="ml-10 sm:ml-0 sm:w-1/2 p-5 rounded-xl sm:rounded-2xl bg-white border border-cream-border/90 shadow-2xs hover:shadow-md transition-all duration-200 space-y-1.5">
-                      <span className="text-xs font-bold text-amber-oak uppercase tracking-wider">
-                        {item.year}
-                      </span>
-                      <h3 className="font-display text-base font-bold text-charcoal">
-                        {item.title}
-                      </h3>
-                      <p className="text-xs text-charcoal-muted leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Container>
-        </Section>
-
-        {/* Leadership Team */}
-        <Section variant="cream-surface" padded="default" className="py-12 sm:py-16 lg:py-20 border-t border-cream-border/70">
-          <Container size="wide">
-            <div className="text-center max-w-2xl mx-auto mb-10 sm:mb-14 space-y-2.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-oak bg-white px-3 py-1 rounded-full border border-cream-border/90 shadow-2xs">
-                Key Management
-              </span>
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-charcoal">
-                Materials Specialists & Operations Team
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-              {teamMembers.map((member) => (
-                <div
-                  key={member.id}
-                  className="bg-white rounded-xl sm:rounded-2xl border border-cream-border/90 overflow-hidden shadow-2xs hover:shadow-lg transition-all duration-300 p-5 sm:p-6 space-y-3 group hover:-translate-y-1"
+              <div className="flex flex-wrap gap-3 pt-2">
+                <Button href="/products" variant="amber" rightIcon={<ArrowRight className="w-4 h-4" />}>
+                  View Safarian &amp; Plywood
+                </Button>
+                <Button
+                  href="/contact"
+                  variant="ghost"
+                  className="text-cream hover:text-amber-light hover:bg-forest-surface border border-forest-light/40"
                 >
-                  <div className="w-14 h-14 rounded-xl bg-forest text-amber-300 font-display font-bold text-xl flex items-center justify-center shadow-2xs">
-                    {member.name.split(" ")[0][0]}
-                    {member.name.split(" ")[1]?.[0] || ""}
+                  Office &amp; Factory Locations
+                </Button>
+              </div>
+            </Reveal>
+          </Container>
+        </section>
+
+        {/* Key Figures Bar */}
+        <Section className="bg-white border-b border-cream-border/80 py-12">
+          <Container size="wide">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-6 rounded-2xl bg-cream/60 border border-cream-border flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-amber-oak/15 border border-amber-oak/30 flex items-center justify-center text-amber-oak shrink-0">
+                  <Clock className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="text-3xl font-display font-extrabold text-forest-dark tabular-nums">10+</div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
+                    Years of Industry Experience
                   </div>
-                  <div>
-                    <h3 className="font-display text-base font-bold text-charcoal group-hover:text-forest transition-colors">
-                      {member.name}
+                </div>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-cream/60 border border-cream-border flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-amber-oak/15 border border-amber-oak/30 flex items-center justify-center text-amber-oak shrink-0">
+                  <Users className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="text-3xl font-display font-extrabold text-forest-dark tabular-nums">200+</div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
+                    Trusted Clients Served
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 rounded-2xl bg-forest-dark text-cream border border-forest-light/30 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-amber-oak flex items-center justify-center text-white shrink-0">
+                  <Award className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="text-3xl font-display font-extrabold text-white tabular-nums">100%</div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-amber-light">
+                    Verified Quality Standards
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Container>
+        </Section>
+
+        {/* Mission & Operational Footprint */}
+        <Section className="bg-cream py-16 lg:py-24">
+          <Container size="wide">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+              <Reveal variant="fade-up" className="space-y-6">
+                <span className="text-xs font-bold tracking-widest uppercase text-amber-oak">
+                  How We Operate
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-charcoal tracking-tight">
+                  From Central Ethiopia Manufacturing to Addis Ababa Fulfillment
+                </h2>
+                <p className="text-sm sm:text-base text-charcoal-light leading-relaxed">
+                  Furniture makers and major construction groups depend on sheet boards that arrive flat, cleanly cut, and true to thickness across every order. At {siteConfig.name}, our production in Werabe City keeps bulk availability strong across our entire product range.
+                </p>
+                <div className="space-y-3 pt-2">
+                  {[
+                    "Safarian Boards manufactured in 03mm, 06mm, 08mm, and 12mm thicknesses",
+                    "Structural Plywood supplied in 16mm and our 18mm special product grade",
+                    "Addis Ababa office at Ayer Tena, Shamo Tower, 3rd Floor for quick order scheduling",
+                    "Direct client coordination with 200+ furniture workshops and contractors",
+                  ].map((point) => (
+                    <div key={point} className="flex items-start gap-3">
+                      <CheckCircle2 className="w-5 h-5 text-amber-oak shrink-0 mt-0.5" />
+                      <span className="text-sm text-charcoal font-medium">{point}</span>
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+
+              <StaggerContainer className="grid grid-cols-1 gap-5">
+                {values.map((val) => (
+                  <StaggerItem key={val.title}>
+                    <div className="p-6 rounded-2xl bg-white border border-cream-border shadow-xs hover:shadow-md hover:border-amber-oak/40 transition-all duration-300 flex gap-4">
+                      <div className="w-11 h-11 rounded-xl bg-amber-oak/10 border border-amber-oak/20 flex items-center justify-center text-amber-oak shrink-0">
+                        <val.icon className="w-5 h-5" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <h3 className="text-lg font-display font-bold text-charcoal">
+                          {val.title}
+                        </h3>
+                        <p className="text-sm text-charcoal-light leading-relaxed">
+                          {val.desc}
+                        </p>
+                      </div>
+                    </div>
+                  </StaggerItem>
+                ))}
+              </StaggerContainer>
+            </div>
+          </Container>
+        </Section>
+
+        {/* Timeline */}
+        <Section className="bg-white border-y border-cream-border/80 py-16 lg:py-24">
+          <Container size="wide">
+            <Reveal variant="fade-up" className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+              <span className="text-xs font-bold tracking-widest uppercase text-amber-oak">
+                Our Journey
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-charcoal tracking-tight">
+                10+ Years of Steady Growth
+              </h2>
+            </Reveal>
+
+            <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {milestones.map((item) => (
+                <StaggerItem key={item.step}>
+                  <div className="h-full p-6 rounded-2xl bg-cream/60 border border-cream-border hover:border-amber-oak/50 transition-all duration-300 space-y-3">
+                    <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-forest-dark text-amber-light font-display font-bold text-sm">
+                      {item.step}
+                    </span>
+                    <h3 className="text-lg font-display font-bold text-charcoal">
+                      {item.title}
                     </h3>
-                    <p className="text-xs font-semibold text-amber-oak">
-                      {member.role}
+                    <p className="text-sm text-charcoal-light leading-relaxed">
+                      {item.desc}
                     </p>
                   </div>
-                  <p className="text-xs text-charcoal-muted leading-relaxed">
-                    {member.bio}
+                </StaggerItem>
+              ))}
+            </StaggerContainer>
+          </Container>
+        </Section>
+
+        {/* Companies We Work With */}
+        <Section className="bg-cream py-16 lg:py-20">
+          <Container size="wide">
+            <Reveal variant="fade-up" className="text-center max-w-2xl mx-auto mb-10 space-y-2">
+              <span className="text-xs font-bold tracking-widest uppercase text-amber-oak">
+                Long-Term Client Partnerships
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-charcoal">
+                Selected Companies We Supply
+              </h2>
+              <p className="text-sm text-charcoal-light">
+                Part of our 200+ clients relying on bmtradingplc across commercial development and Ethiopian furniture production.
+              </p>
+            </Reveal>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {partners.map((partner) => (
+                <div
+                  key={partner.id}
+                  className="group p-6 rounded-2xl bg-white border border-cream-border shadow-xs flex flex-col gap-4 hover:border-amber-oak/50 transition-all duration-300"
+                >
+                  <div className="flex flex-col items-start gap-3">
+                    <PartnerLogoBadge
+                      logoUrl={partner.logo_url}
+                      name={partner.name}
+                      initials={partner.initials}
+                      size="lg"
+                    />
+                    <div>
+                      <h3 className="text-base font-display font-bold text-charcoal leading-tight">
+                        {partner.name}
+                      </h3>
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-oak">
+                        {partner.category}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-charcoal-subtle">
+                    Active commercial partner supplied with Safarian &amp; Plywood sheets.
                   </p>
                 </div>
               ))}
@@ -293,26 +281,40 @@ export default function AboutPage() {
           </Container>
         </Section>
 
-        {/* Certifications CTA */}
-        <Section variant="forest" woodgrain padded="default" className="py-12 sm:py-16">
-          <Container size="default" className="text-center space-y-5">
-            <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white">
-              Need Verification of Quality Standards?
-            </h2>
-            <p className="text-xs sm:text-sm text-white/80 max-w-xl mx-auto leading-relaxed">
-              We supply official mill test certificates, boiling water test reports, and formaldehyde emission compliance documentation with every consignment.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-3 pt-2">
-              <Button href="/contact" variant="amber" size="default" className="w-full sm:w-auto font-bold">
-                Contact Technical QA Team
-              </Button>
-              <Button href="/products" variant="outline" size="default" className="w-full sm:w-auto border-white/30 text-white hover:bg-white hover:text-forest font-bold">
-                Browse Certified Products
-              </Button>
+        {/* Bottom CTA */}
+        <Section className="bg-forest-dark text-cream py-16 bg-dark-grain">
+          <Container size="wide">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+              <div className="space-y-2 max-w-xl">
+                <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-white">
+                  Ready to Order Safarian or Plywood?
+                </h2>
+                <p className="text-sm text-cream/80">
+                  Contact our Addis Ababa office at Ayer Tena, Shamo Tower, 3rd Floor or reach us directly on{" "}
+                  <Link href={`tel:${siteConfig.contact.phone}`} className="text-amber-light font-bold hover:underline">
+                    {siteConfig.contact.phoneDisplay}
+                  </Link>
+                  .
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Button href="/quote" variant="amber" rightIcon={<ArrowRight className="w-4 h-4" />}>
+                  Request a Quote
+                </Button>
+                <Button
+                  href={`tel:${siteConfig.contact.phone}`}
+                  variant="ghost"
+                  className="border border-white/20 text-white hover:bg-white/10"
+                  leftIcon={<Phone className="w-4 h-4" />}
+                >
+                  {siteConfig.contact.phoneDisplay}
+                </Button>
+              </div>
             </div>
           </Container>
         </Section>
       </main>
+
       <Footer />
     </>
   );

@@ -3,17 +3,18 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Layers,
-  Truck,
-  User,
-  ArrowRight,
-  ArrowLeft,
   CheckCircle2,
-  ShieldCheck,
-  AlertCircle,
+  ChevronRight,
+  ChevronLeft,
+  Layers,
+  MapPin,
+  UserCheck,
   Sparkles,
+  Phone,
+  AlertCircle,
+  RotateCw,
+  Send,
 } from "lucide-react";
-import { categories, products } from "@/data/seed-data";
 import { siteConfig } from "@/lib/siteConfig";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -21,148 +22,233 @@ import { useToast } from "@/lib/toast-context";
 
 interface QuoteWizardProps {
   initialProduct?: string;
+  initialThickness?: string;
+  initialQuantity?: string;
 }
 
-export function QuoteWizard({ initialProduct = "" }: QuoteWizardProps) {
-  const { showToast } = useToast();
-  const [currentStep, setCurrentStep] = useState<number>(1);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+const PRODUCT_OPTIONS = [
+  {
+    name: "Safarian",
+    subtitle: "Precision Boards in 4 Gauges",
+    thicknesses: ["03mm", "06mm", "08mm", "12mm"],
+    specialThickness: null,
+  },
+  {
+    name: "Plywood",
+    subtitle: "Structural Panels • 18mm Special Product",
+    thicknesses: ["16mm", "18mm"],
+    specialThickness: "18mm",
+  },
+];
 
-  // Form State
-  const [formData, setFormData] = useState({
-    // Step 1: Product Specifications
-    category: "",
-    productName: initialProduct || "",
-    thickness: "18mm",
-    grade: "BS 1088 / Standard Marine",
-    // Step 2: Quantity & Logistics
-    quantity: "500 Sheets",
-    deliveryType: "delivery", // 'delivery' or 'yard_pickup'
-    deliveryAddress: "",
-    targetDate: "",
-    // Step 3: Client Identity
-    fullName: "",
-    companyName: "",
-    email: "",
+const APPLICATION_OPTIONS = [
+  "Furniture & Cabinetry",
+  "Interior Partitioning & Doors",
+  "Commercial Development Fit-Out",
+  "Structural & Formwork",
+  "Wholesale Distribution",
+];
+
+export function QuoteWizard({
+  initialProduct = "",
+  initialThickness = "",
+  initialQuantity = "",
+}: QuoteWizardProps) {
+  const { showToast } = useToast();
+
+  const normalizedInitialProduct = initialProduct.toLowerCase().includes("safarian")
+    ? "Safarian"
+    : initialProduct.toLowerCase().includes("plywood")
+    ? "Plywood"
+    : "Plywood";
+
+  const defaultThicknesses =
+    normalizedInitialProduct === "Safarian"
+      ? ["03mm", "06mm", "08mm", "12mm"]
+      : ["16mm", "18mm"];
+
+  const defaultThickness = defaultThicknesses.includes(initialThickness)
+    ? initialThickness
+    : normalizedInitialProduct === "Safarian"
+    ? "08mm"
+    : "18mm";
+
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const [form, setForm] = useState({
+    product: normalizedInitialProduct,
+    thickness: defaultThickness,
+    quantity: initialQuantity || "100",
+    application: APPLICATION_OPTIONS[0],
+    location: "",
+    timeline: "Immediate Dispatch",
+    name: "",
+    company: "",
     phone: "",
+    email: "",
     notes: "",
-    // Honeypot
-    hp_field: "",
   });
 
-  const steps = [
-    { number: 1, title: "Specification", icon: Layers },
-    { number: 2, title: "Quantity & Yard", icon: Truck },
-    { number: 3, title: "Contact Details", icon: User },
-  ];
+  const activeProductConfig =
+    PRODUCT_OPTIONS.find((p) => p.name === form.product) || PRODUCT_OPTIONS[1];
 
-  const handleNext = () => {
-    setErrorMsg(null);
-    if (currentStep === 1) {
-      if (!formData.productName.trim()) {
-        setErrorMsg("Please select or specify a timber/plywood product.");
-        return;
-      }
-    } else if (currentStep === 2) {
-      if (!formData.quantity.trim()) {
-        setErrorMsg("Please specify your required quantity or sheet count.");
-        return;
-      }
-    }
-    setCurrentStep((prev) => Math.min(prev + 1, 3));
+  const handleProductSelect = (productName: string) => {
+    const config = PRODUCT_OPTIONS.find((p) => p.name === productName) || PRODUCT_OPTIONS[0];
+    setForm((prev) => ({
+      ...prev,
+      product: productName,
+      thickness:
+        config.specialThickness ||
+        (config.thicknesses.includes(prev.thickness) ? prev.thickness : config.thicknesses[0]),
+    }));
   };
 
-  const handleBack = () => {
-    setErrorMsg(null);
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
+  const validateStep = (targetStep: number) => {
+    const nextErrors: Record<string, string> = {};
+
+    if (targetStep === 1) {
+      if (!form.quantity || Number(form.quantity) < 1) {
+        nextErrors.quantity = "Please enter at least 1 sheet.";
+      }
+    }
+
+    if (targetStep === 2) {
+      if (!form.location.trim()) {
+        nextErrors.location = "Please enter your delivery city or Addis Ababa sub-city.";
+      }
+    }
+
+    if (targetStep === 3) {
+      if (!form.name.trim() || form.name.trim().length < 2) {
+        nextErrors.name = "Please enter your full name.";
+      }
+      if (!form.phone.trim() || form.phone.trim().length < 8) {
+        nextErrors.phone = "Please provide a valid telephone number.";
+      }
+      if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+        nextErrors.email = "Please enter a valid email address.";
+      }
+    }
+
+    setFieldErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const nextStep = () => {
+    if (validateStep(step)) {
+      setStep((s) => (s < 3 ? ((s + 1) as 1 | 2 | 3) : s));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg(null);
+    if (submitting || !validateStep(3)) return;
 
-    if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim()) {
-      setErrorMsg("Please fill in your name, email, and phone number.");
-      return;
-    }
-
-    if (formData.hp_field) {
-      return; // Honeypot triggered
-    }
-
-    setIsSubmitting(true);
+    setSubmitting(true);
+    setErrorMessage(null);
 
     try {
-      const response = await fetch("/api/quote", {
+      const productLabel = `${form.product} (${form.thickness}${
+        form.thickness === "18mm" ? " - Special Product" : ""
+      })`;
+
+      const res = await fetch("/api/quote", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: form.name,
+          company: form.company,
+          email: form.email,
+          phone: form.phone,
+          product: productLabel,
+          thickness: form.thickness,
+          quantity: `${form.quantity} sheets`,
+          application: form.application,
+          location: form.location,
+          timeline: form.timeline,
+          notes: form.notes,
+        }),
       });
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to submit quote request.");
+      if (!res.ok) {
+        throw new Error("Unable to submit quote request");
       }
 
-      setIsSuccess(true);
+      setSubmitted(true);
       showToast({
         type: "success",
-        title: "RFQ Submitted Successfully",
-        message: "Your official quote proforma has been queued for yard dispatch review.",
+        title: "Quote request submitted",
+        message: `Our team at Ayer Tena will contact you shortly regarding ${productLabel}.`,
       });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
-      setErrorMsg(msg);
+    } catch {
+      setErrorMessage(
+        `Your quote request couldn't go through right now. Please retry or call ${siteConfig.contact.phoneDisplay}.`
+      );
       showToast({
         type: "error",
-        title: "Submission Error",
-        message: msg,
+        title: "Submission issue",
+        message: "Please retry or reach us on 0911 247 821.",
       });
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
-  if (isSuccess) {
+  if (submitted) {
     return (
-      <div className="bg-white rounded-3xl border border-cream-border p-8 sm:p-12 text-center space-y-6 shadow-xl max-w-2xl mx-auto">
-        <div className="w-20 h-20 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-sm">
+      <div
+        className="max-w-2xl mx-auto p-8 sm:p-12 rounded-3xl bg-white border border-cream-border shadow-xl text-center space-y-6"
+        role="status"
+        aria-live="polite"
+      >
+        <div className="w-20 h-20 rounded-full bg-forest text-amber-light flex items-center justify-center mx-auto shadow-lg">
           <CheckCircle2 className="w-10 h-10" />
         </div>
 
         <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-widest text-amber-oak bg-amber-pale px-3 py-1 rounded-full border border-amber-light/30">
-            Request Logged in System
+          <span className="text-xs font-extrabold uppercase tracking-widest text-amber-oak">
+            Quote Request Sent
           </span>
-          <h2 className="font-display text-3xl font-extrabold text-charcoal">
-            Formal Quotation Initiated!
+          <h2 className="text-3xl font-display font-extrabold text-charcoal">
+            Thank You, {form.name}
           </h2>
-          <p className="text-sm text-charcoal-muted leading-relaxed max-w-lg mx-auto">
-            Thank you, <strong className="text-charcoal font-semibold">{formData.fullName}</strong>. A dedicated {siteConfig.name} account manager has received your Bill of Quantities request for <strong className="text-charcoal">{formData.productName} ({formData.quantity})</strong>.
+          <p className="text-sm sm:text-base text-charcoal-light max-w-lg mx-auto leading-relaxed">
+            Your request for{" "}
+            <strong className="text-charcoal">
+              {form.quantity} sheets of {form.thickness} {form.product}
+            </strong>{" "}
+            has been logged for our Addis Ababa coordination office ({siteConfig.contact.address.full}).
           </p>
         </div>
 
-        <div className="p-4 rounded-2xl bg-cream-surface border border-cream-border text-xs text-charcoal-muted space-y-1 text-left">
-          <p className="font-semibold text-charcoal">What happens next?</p>
-          <ul className="list-disc list-inside space-y-1 pt-1">
-            <li>Our pricing desk reviews inventory reserves and logistics options.</li>
-            <li>A stamped PDF proforma invoice will be delivered to <span className="font-semibold text-charcoal">{formData.email}</span> within 2 hours.</li>
-            <li>We will follow up via WhatsApp / phone on <span className="font-semibold text-charcoal">{formData.phone}</span>.</li>
-          </ul>
+        <div className="p-4 rounded-2xl bg-cream/60 border border-cream-border text-xs text-charcoal-light flex flex-col sm:flex-row items-center justify-center gap-3">
+          <span>Need immediate assistance? Call, WhatsApp, or Telegram us on:</span>
+          <a
+            href={`tel:${siteConfig.contact.phone}`}
+            className="inline-flex items-center gap-1.5 font-extrabold text-forest hover:text-amber-oak"
+          >
+            <Phone className="w-4 h-4" />
+            {siteConfig.contact.phoneDisplay}
+          </a>
         </div>
 
-        <div className="pt-2">
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <Button
-            variant="amber"
+            type="button"
+            variant="outline"
             onClick={() => {
-              setIsSuccess(false);
-              setCurrentStep(1);
+              setSubmitted(false);
+              setStep(1);
             }}
           >
-            Create Another Quote Request
+            Submit Another Request
+          </Button>
+          <Button href="/products" variant="amber">
+            Back to Product Catalog
           </Button>
         </div>
       </div>
@@ -170,421 +256,384 @@ export function QuoteWizard({ initialProduct = "" }: QuoteWizardProps) {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      {/* Progress Indicator Steps */}
-      <div className="bg-white p-4 sm:p-6 rounded-2xl border border-cream-border shadow-xs">
-        <div className="flex items-center justify-between relative">
-          <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-0.5 bg-cream-border z-0" />
-          <div
-            className="absolute left-6 top-1/2 -translate-y-1/2 h-0.5 bg-amber-oak transition-all duration-300 z-0"
-            style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 88}%` }}
-          />
-
-          {steps.map((s) => {
-            const Icon = s.icon;
-            const isCompleted = currentStep > s.number;
-            const isCurrent = currentStep === s.number;
-
-            return (
-              <div key={s.number} className="relative z-10 flex flex-col items-center">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-xs transition-colors ${
-                    isCompleted
-                      ? "bg-forest text-white"
-                      : isCurrent
-                      ? "bg-amber-oak text-white shadow-md shadow-amber-oak/30 ring-4 ring-amber-pale"
-                      : "bg-cream-surface text-charcoal-subtle border border-cream-border"
-                  }`}
-                >
-                  {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : s.number}
-                </div>
-                <span
-                  className={`text-[10px] sm:text-[11px] font-bold mt-1.5 transition-colors text-center line-clamp-1 max-w-[85px] sm:max-w-none ${
-                    isCurrent ? "text-amber-oak" : "text-charcoal-muted"
-                  }`}
-                >
-                  {s.title}
-                </span>
-              </div>
-            );
-          })}
-        </div>
+    <div className="max-w-4xl mx-auto rounded-3xl bg-white border border-cream-border shadow-xl overflow-hidden">
+      {/* Stepper Header */}
+      <div className="bg-forest-dark text-white px-6 sm:px-8 py-5 border-b border-forest-light/30 flex items-center justify-between gap-4">
+        {[
+          { num: 1, label: "Board & Thickness", icon: Layers },
+          { num: 2, label: "Delivery & Schedule", icon: MapPin },
+          { num: 3, label: "Contact & Submit", icon: UserCheck },
+        ].map((item) => {
+          const active = step === item.num;
+          const done = step > item.num;
+          return (
+            <button
+              key={item.num}
+              type="button"
+              onClick={() => {
+                if (item.num < step) setStep(item.num as 1 | 2 | 3);
+              }}
+              className={`flex items-center gap-2.5 text-left transition-opacity ${
+                active ? "opacity-100" : done ? "opacity-85 cursor-pointer" : "opacity-45 cursor-default"
+              }`}
+            >
+              <span
+                className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-extrabold border ${
+                  active
+                    ? "bg-amber-oak text-white border-amber-oak shadow-sm"
+                    : done
+                    ? "bg-emerald-600 text-white border-emerald-500"
+                    : "bg-white/10 text-white border-white/20"
+                }`}
+              >
+                {done ? <CheckCircle2 className="w-4 h-4" /> : item.num}
+              </span>
+              <span className="hidden sm:block text-xs font-bold uppercase tracking-wider">
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Main Multi-Step Card */}
-      <div className="bg-white rounded-3xl border border-cream-border p-6 sm:p-10 shadow-sm relative">
-        {errorMsg && (
-          <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
-            <span>{errorMsg}</span>
+      {/* Form Body */}
+      <form onSubmit={handleSubmit} className="p-6 sm:p-10 space-y-6" noValidate>
+        {errorMessage && (
+          <div
+            className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start justify-between gap-3 text-xs text-red-800"
+            role="alert"
+          >
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+              <span>{errorMessage}</span>
+            </div>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="inline-flex items-center gap-1 font-bold underline shrink-0"
+            >
+              <RotateCw className="w-3.5 h-3.5" />
+              Retry
+            </button>
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          {/* Honeypot */}
-          <input
-            type="text"
-            value={formData.hp_field}
-            onChange={(e) => setFormData({ ...formData, hp_field: e.target.value })}
-            style={{ display: "none" }}
-            tabIndex={-1}
-            autoComplete="off"
-          />
-
-          <AnimatePresence mode="wait">
-            {/* STEP 1: Material & Product Specification */}
-            {currentStep === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
-                className="space-y-6"
-              >
-                <div className="space-y-1">
-                  <span className="text-xs font-bold uppercase tracking-wider text-amber-oak">
-                    Step 1 of 3
-                  </span>
-                  <h3 className="font-display text-2xl font-bold text-charcoal">
-                    Select Product Specifications
-                  </h3>
-                  <p className="text-xs text-charcoal-muted">
-                    Choose the panel category and core thickness required for your project.
-                  </p>
+        <AnimatePresence mode="wait">
+          {step === 1 && (
+            <motion.div
+              key="step-1"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-6"
+            >
+              {/* Choose Safarian or Plywood */}
+              <div className="space-y-3">
+                <label className="block text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
+                  1. Select Product Lineup <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {PRODUCT_OPTIONS.map((prod) => {
+                    const selected = form.product === prod.name;
+                    return (
+                      <button
+                        key={prod.name}
+                        type="button"
+                        onClick={() => handleProductSelect(prod.name)}
+                        className={`p-5 rounded-2xl border-2 text-left transition-all ${
+                          selected
+                            ? "border-amber-oak bg-amber-oak/10 shadow-sm"
+                            : "border-cream-border bg-cream/30 hover:border-forest/40"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-xl font-display font-extrabold text-charcoal">
+                            {prod.name}
+                          </span>
+                          {prod.specialThickness && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-oak text-white text-[10px] font-extrabold uppercase">
+                              <Sparkles className="w-3 h-3" />
+                              18mm Special
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-charcoal-subtle mt-1">{prod.subtitle}</p>
+                      </button>
+                    );
+                  })}
                 </div>
+              </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-2">
-                      Popular Timber Categories
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                      {categories.map((cat) => (
-                        <button
-                          key={cat.id}
-                          type="button"
-                          onClick={() =>
-                            setFormData({
-                              ...formData,
-                              category: cat.name,
-                              productName: cat.name,
-                            })
-                          }
-                          className={`p-3 rounded-xl border text-left text-xs font-semibold transition-all ${
-                            formData.category === cat.name
-                              ? "bg-forest text-white border-forest shadow-xs"
-                              : "bg-white text-charcoal border-cream-border hover:bg-cream-surface"
+              {/* Thickness Selector */}
+              <div className="space-y-3">
+                <label className="block text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
+                  2. Select {form.product} Thickness <span className="text-red-500">*</span>
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {activeProductConfig.thicknesses.map((t) => {
+                    const selected = form.thickness === t;
+                    const isSpecial = t === "18mm";
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setForm((f) => ({ ...f, thickness: t }))}
+                        className={`px-4 py-3.5 rounded-2xl border text-left transition-all ${
+                          selected
+                            ? "border-forest bg-forest text-white shadow-sm"
+                            : isSpecial
+                            ? "border-amber-oak bg-amber-oak/10 text-charcoal hover:bg-amber-oak/20"
+                            : "border-cream-border bg-cream/40 text-charcoal hover:bg-white"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-base font-display font-extrabold">{t}</span>
+                          {isSpecial && (
+                            <Sparkles
+                              className={`w-3.5 h-3.5 ${selected ? "text-amber-300" : "text-amber-oak"}`}
+                            />
+                          )}
+                        </div>
+                        <span
+                          className={`text-[10px] font-semibold block ${
+                            selected ? "text-cream/80" : "text-charcoal-subtle"
                           }`}
                         >
-                          {cat.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Input
-                    label="Specific Product or Grade Required"
-                    placeholder="e.g. AquaShield BS 1088 Marine or ProForm 18mm Shuttering"
-                    value={formData.productName}
-                    required
-                    onChange={(e) =>
-                      setFormData({ ...formData, productName: e.target.value })
-                    }
-                  />
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1.5">
-                        Core Thickness
-                      </label>
-                      <select
-                        value={formData.thickness}
-                        onChange={(e) =>
-                          setFormData({ ...formData, thickness: e.target.value })
-                        }
-                        className="w-full h-11 px-4 text-sm bg-white rounded-xl border border-cream-border text-charcoal focus:border-amber-oak focus:outline-none"
-                      >
-                        <option value="3mm / 4mm">3mm – 4mm (Underlay / Backing)</option>
-                        <option value="6mm">6mm (Light Linings)</option>
-                        <option value="9mm">9mm (Joinery Panels)</option>
-                        <option value="12mm">12mm (Cabinet Carcass / Sheathing)</option>
-                        <option value="15mm">15mm (Heavy Joinery)</option>
-                        <option value="18mm">18mm (Standard Formwork & Flooring)</option>
-                        <option value="21mm">21mm (Heavy Civil Shuttering)</option>
-                        <option value="25mm+">25mm – 30mm (Heavy Transport Decks)</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-1.5">
-                        Adhesive / Bonding Grade
-                      </label>
-                      <select
-                        value={formData.grade}
-                        onChange={(e) =>
-                          setFormData({ ...formData, grade: e.target.value })
-                        }
-                        className="w-full h-11 px-4 text-sm bg-white rounded-xl border border-cream-border text-charcoal focus:border-amber-oak focus:outline-none"
-                      >
-                        <option value="BS 1088 / Standard Marine">
-                          BS 1088 Boiling Water Proof (WBP)
-                        </option>
-                        <option value="Dynea 120g Phenolic Shuttering">
-                          Dynea 120g/m² Phenolic Film
-                        </option>
-                        <option value="MR / Interior Joinery">
-                          Moisture Resistant (MR / E1 Glue)
-                        </option>
-                        <option value="E0 Ultra-Low VOC">
-                          CARB Phase 2 / E0 Standard
-                        </option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 flex justify-end">
-                  <Button
-                    type="button"
-                    variant="amber"
-                    onClick={handleNext}
-                    rightIcon={<ArrowRight className="w-4 h-4 ml-1" />}
-                  >
-                    Continue to Step 2: Quantity
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-
-            {/* STEP 2: Quantity & Logistics */}
-            {currentStep === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
-                className="space-y-6"
-              >
-                <div className="space-y-1">
-                  <span className="text-xs font-bold uppercase tracking-wider text-amber-oak">
-                    Step 2 of 3
-                  </span>
-                  <h3 className="font-display text-2xl font-bold text-charcoal">
-                    Estimated Quantity & Dispatch Mode
-                  </h3>
-                  <p className="text-xs text-charcoal-muted">
-                    We offer tiered wholesale discounts based on sheet count or full container lots.
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <Input
-                    label="Estimated Quantity Needed"
-                    placeholder="e.g. 250 sheets, 3 bundles, or 1x 20ft container"
-                    value={formData.quantity}
-                    required
-                    onChange={(e) =>
-                      setFormData({ ...formData, quantity: e.target.value })
-                    }
-                  />
-
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-charcoal mb-2">
-                      Fulfillment Method
-                    </label>
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setFormData({ ...formData, deliveryType: "delivery" })
-                        }
-                        className={`p-4 rounded-xl border text-left text-xs space-y-1 transition-all ${
-                          formData.deliveryType === "delivery"
-                            ? "bg-forest-surface text-white border-forest shadow-xs"
-                            : "bg-white text-charcoal border-cream-border hover:bg-cream-surface"
-                        }`}
-                      >
-                        <span className="font-bold block">
-                          Jobsite Flatbed Delivery
-                        </span>
-                        <span className="opacity-75 block text-[11px]">
-                          Delivered directly to your construction site or facility
+                          {isSpecial ? "Special Product" : `${form.product} Gauge`}
                         </span>
                       </button>
+                    );
+                  })}
+                </div>
+              </div>
 
+              {/* Quantity & Application */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <Input
+                    label="Required Sheet Quantity"
+                    type="number"
+                    min={1}
+                    required
+                    value={form.quantity}
+                    error={fieldErrors.quantity}
+                    onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
+                  />
+                  <div className="flex flex-wrap gap-1.5">
+                    {["50", "100", "250", "500"].map((q) => (
                       <button
+                        key={q}
                         type="button"
-                        onClick={() =>
-                          setFormData({ ...formData, deliveryType: "yard_pickup" })
-                        }
-                        className={`p-4 rounded-xl border text-left text-xs space-y-1 transition-all ${
-                          formData.deliveryType === "yard_pickup"
-                            ? "bg-forest-surface text-white border-forest shadow-xs"
-                            : "bg-white text-charcoal border-cream-border hover:bg-cream-surface"
+                        onClick={() => setForm((f) => ({ ...f, quantity: q }))}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold border transition-colors ${
+                          form.quantity === q
+                            ? "bg-forest text-white border-forest"
+                            : "bg-cream/50 text-charcoal-subtle border-cream-border hover:text-charcoal"
                         }`}
                       >
-                        <span className="font-bold block">
-                          Central Yard Gate Collection
-                        </span>
-                        <span className="opacity-75 block text-[11px]">
-                          Pick up with your own transport from our warehouse
-                        </span>
+                        {q} sheets
                       </button>
-                    </div>
+                    ))}
                   </div>
-
-                  {formData.deliveryType === "delivery" && (
-                    <Input
-                      label="Target Jobsite City or Region in Ethiopia"
-                      placeholder="e.g. Addis Ababa (Bole, Kality, Kazanchis), Hawassa, Adama, etc."
-                      value={formData.deliveryAddress}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          deliveryAddress: e.target.value,
-                        })
-                      }
-                    />
-                  )}
-
-                  <Input
-                    label="Expected Delivery or Start Date"
-                    type="date"
-                    value={formData.targetDate}
-                    onChange={(e) =>
-                      setFormData({ ...formData, targetDate: e.target.value })
-                    }
-                  />
                 </div>
 
-                <div className="pt-4 flex items-center justify-between">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={handleBack}
-                    leftIcon={<ArrowLeft className="w-4 h-4 mr-1" />}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
+                    Primary Application
+                  </label>
+                  <select
+                    value={form.application}
+                    onChange={(e) => setForm((f) => ({ ...f, application: e.target.value }))}
+                    className="w-full h-11 px-3.5 rounded-xl border border-cream-border bg-white text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-amber-oak"
                   >
-                    Back
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="amber"
-                    onClick={handleNext}
-                    rightIcon={<ArrowRight className="w-4 h-4 ml-1" />}
-                  >
-                    Continue to Step 3: Contact
-                  </Button>
+                    {APPLICATION_OPTIONS.map((app) => (
+                      <option key={app} value={app}>
+                        {app}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              </motion.div>
-            )}
+              </div>
 
-            {/* STEP 3: Contact & Company Details */}
-            {currentStep === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
-                className="space-y-6"
-              >
-                <div className="space-y-1">
-                  <span className="text-xs font-bold uppercase tracking-wider text-amber-oak">
-                    Step 3 of 3
+              <div className="pt-4 border-t border-cream-border flex justify-end">
+                <Button
+                  type="button"
+                  variant="amber"
+                  size="lg"
+                  onClick={nextStep}
+                  rightIcon={<ChevronRight className="w-4 h-4" />}
+                >
+                  Continue to Delivery
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 2 && (
+            <motion.div
+              key="step-2"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-6"
+            >
+              <Input
+                label="Delivery Location / Project Site"
+                required
+                placeholder="e.g. Addis Ababa (Ayer Tena, Bole, Kazanchis), Werabe, Hawassa, Adama"
+                helperText="Specify city, sub-city, or indicate if picking up directly from Werabe / Addis Ababa"
+                value={form.location}
+                error={fieldErrors.location}
+                onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
+              />
+
+              <div className="space-y-2.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
+                  Preferred Schedule
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    "Immediate Dispatch",
+                    "Within 2 Weeks",
+                    "Within This Month",
+                    "Ongoing Scheduled Supply",
+                  ].map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setForm((f) => ({ ...f, timeline: option }))}
+                      className={`px-4 py-3 rounded-xl border text-left text-sm font-semibold transition-all ${
+                        form.timeline === option
+                          ? "border-amber-oak bg-amber-oak/10 text-amber-900"
+                          : "border-cream-border bg-cream/30 text-charcoal hover:bg-white"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-cream-border flex items-center justify-between gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setStep(1)}
+                  leftIcon={<ChevronLeft className="w-4 h-4" />}
+                >
+                  Back
+                </Button>
+                <Button
+                  type="button"
+                  variant="amber"
+                  size="lg"
+                  onClick={nextStep}
+                  rightIcon={<ChevronRight className="w-4 h-4" />}
+                >
+                  Continue to Contact Details
+                </Button>
+              </div>
+            </motion.div>
+          )}
+
+          {step === 3 && (
+            <motion.div
+              key="step-3"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -12 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-6"
+            >
+              {/* Summary Strip (Zero Prices) */}
+              <div className="p-4 rounded-2xl bg-forest-dark text-cream flex flex-wrap items-center justify-between gap-3 text-xs">
+                <div className="space-y-0.5">
+                  <span className="uppercase tracking-wider text-[10px] font-bold text-amber-light">
+                    Request Summary
                   </span>
-                  <h3 className="font-display text-2xl font-bold text-charcoal">
-                    Where Should We Send the Proforma Invoice?
-                  </h3>
-                  <p className="text-xs text-charcoal-muted">
-                    We will send official pricing and specifications directly to your email.
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Input
-                      label="Contact Full Name"
-                      placeholder="e.g. Sarah Lindqvist"
-                      required
-                      value={formData.fullName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, fullName: e.target.value })
-                      }
-                    />
-                    <Input
-                      label="Company / Firm Name"
-                      placeholder="e.g. Nordic Craft Interiors"
-                      value={formData.companyName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, companyName: e.target.value })
-                      }
-                    />
+                  <div className="font-bold text-sm text-white">
+                    {form.quantity} sheets • {form.product} ({form.thickness}
+                    {form.thickness === "18mm" ? " — Special Product" : ""})
                   </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Input
-                      label="Official Email Address"
-                      type="email"
-                      placeholder="e.g. sarah@nordiccraft.com"
-                      required
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                    />
-                    <Input
-                      label="Phone / WhatsApp Number"
-                      type="tel"
-                      placeholder="e.g. +251 911 234 567"
-                      required
-                      value={formData.phone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value })
-                      }
-                    />
-                  </div>
-
-                  <Textarea
-                    label="Additional Project Notes or Cutting Instructions"
-                    placeholder="Mention any custom size requirements, container booking timelines, or technical certifications needed..."
-                    rows={3}
-                    value={formData.notes}
-                    onChange={(e) =>
-                      setFormData({ ...formData, notes: e.target.value })
-                    }
-                  />
                 </div>
-
-                <div className="pt-4 flex items-center justify-between">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={handleBack}
-                    leftIcon={<ArrowLeft className="w-4 h-4 mr-1" />}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    type="submit"
-                    variant="amber"
-                    size="lg"
-                    isLoading={isSubmitting}
-                    loadingText="Generating Commercial RFQ..."
-                    disabled={isSubmitting}
-                    className="font-bold shadow-md shadow-amber-oak/20"
-                    rightIcon={<CheckCircle2 className="w-4 h-4 ml-1" />}
-                  >
-                    Submit Request for Proforma Quote
-                  </Button>
+                <div className="text-cream/80">
+                  {form.location || "Location pending"} • {form.timeline}
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </form>
-      </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  label="Full Name"
+                  required
+                  placeholder="e.g. Dawit Tadesse"
+                  value={form.name}
+                  error={fieldErrors.name}
+                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                />
+                <Input
+                  label="Company / Workshop (Optional)"
+                  placeholder="e.g. Classic Furniture / MIDROC Group"
+                  value={form.company}
+                  onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  label="Telephone Number"
+                  type="tel"
+                  required
+                  placeholder="e.g. 0911 247 821"
+                  value={form.phone}
+                  error={fieldErrors.phone}
+                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                />
+                <Input
+                  label="Email Address"
+                  type="email"
+                  required
+                  placeholder="procurement@company.com"
+                  value={form.email}
+                  error={fieldErrors.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                />
+              </div>
+
+              <Textarea
+                label="Additional Notes (Optional)"
+                rows={3}
+                placeholder="Mixed thickness breakdown (e.g. 50 sheets 08mm Safarian + 100 sheets 18mm Plywood), pickup preference, etc."
+                value={form.notes}
+                onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
+              />
+
+              <div className="pt-4 border-t border-cream-border flex items-center justify-between gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setStep(2)}
+                  leftIcon={<ChevronLeft className="w-4 h-4" />}
+                >
+                  Back
+                </Button>
+                <Button
+                  type="submit"
+                  variant="amber"
+                  size="lg"
+                  isLoading={submitting}
+                  loadingText="Submitting Request..."
+                  disabled={submitting}
+                  rightIcon={<Send className="w-4 h-4" />}
+                >
+                  Submit Quote Request
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </form>
     </div>
   );
 }
-

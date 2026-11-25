@@ -1,117 +1,133 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Send, CheckCircle2, AlertCircle, Sparkles } from "lucide-react";
+import { Send, CheckCircle2, AlertCircle, RotateCw, Phone } from "lucide-react";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/lib/toast-context";
 import { siteConfig } from "@/lib/siteConfig";
 
 const contactSchema = z.object({
-  name: z.string().min(2, "Full name must be at least 2 characters"),
-  email: z.string().email("Please provide a valid corporate or work email"),
-  phone: z.string().min(7, "Please provide a valid phone or WhatsApp number"),
-  product: z.string().min(1, "Please specify the timber or plywood product"),
-  quantity: z.string().min(1, "Please specify estimated sheet count or cubic meters"),
-  message: z.string().min(10, "Specification message must be at least 10 characters"),
+  name: z.string().min(2, "Please enter your full name (at least 2 characters)."),
+  email: z.string().email("Please enter a valid email address."),
+  phone: z.string().min(8, "Please provide a valid Ethiopian contact phone number."),
   company: z.string().optional(),
-  website_hp: z.string().max(0, "Bot detected"),
+  product_interest: z.string().optional(),
+  message: z
+    .string()
+    .min(10, "Please share a few details about your required board type, thickness, or quantity."),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
 
 export function ContactForm() {
   const { showToast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [submittedSuccess, setSubmittedSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     reset,
-    watch,
-    formState: { errors, isValid, isDirty },
+    formState: { errors, isSubmitting, isDirty, dirtyFields },
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
-    mode: "onBlur",
+    mode: "onTouched",
     defaultValues: {
       name: "",
       email: "",
       phone: "",
-      product: "",
-      quantity: "",
-      message: "",
       company: "",
-      website_hp: "",
+      product_interest: "",
+      message: "",
     },
   });
 
-  const messageValue = watch("message") || "";
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty && !submittedSuccess) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isDirty, submittedSuccess]);
 
   const onSubmit = async (data: ContactFormData) => {
-    setIsSubmitting(true);
-    setErrorMessage(null);
-
+    setSubmitError(null);
     try {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          company: data.company || "",
+          product: data.product_interest || "General Inquiry (Safarian / Plywood)",
+          quantity: "Inquiry",
+          message: data.message,
+        }),
       });
-
-      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to submit message. Please try again.");
+        throw new Error("Could not submit your inquiry right now.");
       }
 
-      setIsSuccess(true);
+      setSubmittedSuccess(true);
       showToast({
         type: "success",
-        title: "Inquiry Successfully Delivered",
-        message: "A timber consultant has received your inquiry and will respond within 2 hours.",
+        title: "Inquiry sent",
+        message: "Thank you — our Addis Ababa office will respond shortly.",
       });
       reset();
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
-      setErrorMessage(msg);
+    } catch {
+      const msg = `We couldn't send your message right now. Please try again or call ${siteConfig.contact.phoneDisplay}.`;
+      setSubmitError(msg);
       showToast({
         type: "error",
-        title: "Submission Error",
-        message: msg,
+        title: "Message not sent",
+        message: "Please try again or contact us directly by phone.",
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
-  if (isSuccess) {
+  if (submittedSuccess) {
     return (
       <div
+        className="p-8 rounded-2xl bg-forest/5 border border-forest/20 text-center space-y-5"
         role="status"
         aria-live="polite"
-        className="bg-emerald-50 rounded-3xl border border-emerald-200 p-8 sm:p-10 text-center space-y-4 animate-in fade-in zoom-in-95 duration-200"
       >
-        <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-inner">
-          <CheckCircle2 className="w-8 h-8" />
+        <div className="w-16 h-16 rounded-full bg-forest text-white flex items-center justify-center mx-auto shadow-md">
+          <CheckCircle2 className="w-8 h-8 text-amber-light" />
         </div>
-        <h3 className="font-display text-2xl font-bold text-emerald-900">
-          Inquiry Successfully Delivered
-        </h3>
-        <p className="text-sm text-emerald-800 leading-relaxed max-w-md mx-auto">
-          Thank you for reaching out to {siteConfig.name}. A commercial timber consultant has received your specifications and will respond within 2 business hours.
-        </p>
-        <div className="pt-2">
+        <div className="space-y-2">
+          <h3 className="text-2xl font-display font-bold text-forest-dark">
+            Message Received
+          </h3>
+          <p className="text-sm text-charcoal-light max-w-md mx-auto leading-relaxed">
+            Thank you for reaching out to {siteConfig.name}. Our team at {siteConfig.contact.address.full} has received your inquiry and will follow up promptly.
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setIsSuccess(false)}
+            type="button"
+            variant="outline"
+            onClick={() => setSubmittedSuccess(false)}
           >
             Send Another Message
+          </Button>
+          <Button
+            href={`tel:${siteConfig.contact.phone}`}
+            variant="amber"
+            leftIcon={<Phone className="w-4 h-4" />}
+          >
+            Call {siteConfig.contact.phoneDisplay}
           </Button>
         </div>
       </div>
@@ -119,119 +135,102 @@ export function ContactForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-      className="space-y-4 bg-white p-6 sm:p-8 rounded-3xl border border-cream-border shadow-sm transition-all"
-    >
-      {errorMessage && (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+      {submitError && (
         <div
+          className="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start justify-between gap-3 text-xs text-red-800"
           role="alert"
-          className="p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 flex items-start gap-2.5"
         >
-          <AlertCircle className="w-4 h-4 shrink-0 text-red-500 mt-0.5" />
-          <span className="leading-relaxed">{errorMessage}</span>
+          <div className="flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
+            <span>{submitError}</span>
+          </div>
+          <button
+            type="button"
+            onClick={handleSubmit(onSubmit)}
+            className="inline-flex items-center gap-1 font-bold underline shrink-0"
+          >
+            <RotateCw className="w-3.5 h-3.5" />
+            Retry
+          </button>
         </div>
       )}
 
-      {/* Honeypot hidden input */}
-      <input
-        type="text"
-        {...register("website_hp")}
-        style={{ display: "none" }}
-        tabIndex={-1}
-        autoComplete="off"
-        aria-hidden="true"
-      />
-
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
-          label="Your Full Name"
-          placeholder="e.g. Dawit Haile"
+          label="Full Name"
           required
+          placeholder="e.g. Abebe Tadesse"
           error={errors.name?.message}
-          helperText="Lead project contractor or contact person"
+          showValidCheck={Boolean(dirtyFields.name && !errors.name)}
+          isValid={!errors.name}
           {...register("name")}
         />
         <Input
-          label="Company or Contracting Firm"
-          placeholder="e.g. Midroc Construction (Optional)"
+          label="Company / Workshop (Optional)"
+          placeholder="e.g. Mina Furniture / MIDROC Group"
           error={errors.company?.message}
-          helperText="Optional commercial trade name"
           {...register("company")}
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
-          label="Work Email Address"
-          type="email"
-          placeholder="e.g. dawit@example.com"
-          required
-          error={errors.email?.message}
-          helperText="Official quote proforma will be sent here"
-          {...register("email")}
-        />
-        <Input
-          label="Phone / WhatsApp Number"
+          label="Phone Number"
           type="tel"
-          placeholder="e.g. +251 911 234 567"
           required
+          placeholder="+251 911 247 821"
+          helperText="Used for quick sales follow-up or WhatsApp/Telegram"
           error={errors.phone?.message}
-          helperText="For immediate warehouse gate verification"
+          showValidCheck={Boolean(dirtyFields.phone && !errors.phone)}
+          isValid={!errors.phone}
           {...register("phone")}
         />
+        <Input
+          label="Email Address"
+          type="email"
+          required
+          placeholder="name@company.com"
+          error={errors.email?.message}
+          showValidCheck={Boolean(dirtyFields.email && !errors.email)}
+          isValid={!errors.email}
+          {...register("email")}
+        />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Input
-          label="Plywood Product / Grade"
-          placeholder="e.g. 18mm BS 1088 Marine / Dynea Shuttering"
-          required
-          error={errors.product?.message}
-          helperText="Specify panel series or core type"
-          {...register("product")}
-        />
-        <Input
-          label="Estimated Quantity"
-          placeholder="e.g. 500 sheets or 1x 40ft container"
-          required
-          error={errors.quantity?.message}
-          helperText="Sheet count or total bundle requirement"
-          {...register("quantity")}
-        />
-      </div>
+      <Input
+        label="Product & Thickness Interest (Optional)"
+        placeholder="e.g. Safarian 08mm & Plywood 18mm Special Product"
+        {...register("product_interest")}
+      />
 
       <Textarea
-        label="Project Specifications & Delivery Details"
-        placeholder="Specify required core species, thickness tolerances, boiling-water-proof bond rating, target jobsite location in Addis Ababa or regions..."
-        rows={4}
+        label="Inquiry Details"
         required
-        maxLength={1000}
-        currentLength={messageValue.length}
+        rows={4}
+        placeholder="Share your required Safarian thickness (03mm, 06mm, 08mm, 12mm) or Plywood thickness (16mm, 18mm Special Product), approximate quantity, and delivery destination..."
         error={errors.message?.message}
-        helperText="Include batch cutting lists or delivery constraints if available"
         {...register("message")}
       />
 
-      <div className="pt-2">
+      <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <p className="text-xs text-charcoal-subtle">
+          Direct phone support: <strong className="text-charcoal">{siteConfig.contact.phoneDisplay}</strong>
+        </p>
+
         <Button
           type="submit"
           variant="amber"
           size="lg"
-          className="w-full font-bold shadow-md shadow-amber-950/20"
           isLoading={isSubmitting}
-          loadingText="Submitting Commercial Inquiry..."
+          loadingText="Sending Message..."
           disabled={isSubmitting}
-          rightIcon={<Send className="w-4 h-4 ml-1" />}
+          rightIcon={<Send className="w-4 h-4" />}
+          className="font-bold shadow-md"
         >
-          Submit Commercial Inquiry
+          Send Message
         </Button>
       </div>
-
-      <p className="text-[11px] text-charcoal-muted text-center pt-2">
-        Your information is used strictly for timber supply quotation purposes under {siteConfig.name} confidentiality terms.
-      </p>
     </form>
   );
 }

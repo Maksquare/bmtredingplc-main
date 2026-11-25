@@ -1,256 +1,254 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { motion } from "framer-motion";
 import {
-  Check,
-  Plus,
-  Minus,
+  Layers,
+  CheckCircle2,
   AlertTriangle,
-  ArrowRight,
-  ShieldCheck,
-  Clock,
+  Sparkles,
   FileText,
   Phone,
+  Minus,
+  Plus,
+  Factory,
 } from "lucide-react";
-import { Product, ProductVariant } from "@/types";
+import { Product } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/siteConfig";
 
 interface ProductVariantSelectorProps {
   product: Product;
+  initialThickness?: string;
 }
 
-export function ProductVariantSelector({ product }: ProductVariantSelectorProps) {
-  // Extract available thicknesses
-  const thicknessOptions = useMemo(() => {
-    return product.specs.thickness.split(",").map((s) => s.trim());
-  }, [product.specs.thickness]);
+export function ProductVariantSelector({
+  product,
+  initialThickness,
+}: ProductVariantSelectorProps) {
+  const variants = useMemo(() => product.variants || [], [product.variants]);
 
-  const sizeOptions = useMemo(() => {
-    return product.specs.standard_size.split("/").map((s) => s.trim());
-  }, [product.specs.standard_size]);
-
-  const [selectedThickness, setSelectedThickness] = useState<string>(
-    thicknessOptions[0] || "18mm"
-  );
-  const [selectedSize, setSelectedSize] = useState<string>(
-    sizeOptions[0] || "1220 x 2440 mm (4ft x 8ft)"
-  );
-  const [quantity, setQuantity] = useState<number>(20);
-
-  // Match variant from product.variants if present
-  const matchedVariant = useMemo(() => {
-    return product.variants?.find((v) => v.thickness === selectedThickness);
-  }, [product.variants, selectedThickness]);
-
-  // Determine stock status for selected variant
-  const stockStatus = matchedVariant?.stock_status || product.stock_status || "in_stock";
-  const stockQty = matchedVariant?.stock_quantity ?? product.stock_quantity ?? 100;
-  const isOutOfStock = stockStatus === "out_of_stock" || stockQty === 0;
-  const isLowStock = !isOutOfStock && (stockStatus === "low_stock" || stockQty <= 15);
-
-  // Dynamic price calculation
-  const unitPrice = useMemo(() => {
-    if (matchedVariant?.price) return matchedVariant.price;
-    if (product.price) {
-      // Scale price slightly by thickness mm
-      const baseMm = 18;
-      const currentMm = parseInt(selectedThickness) || 18;
-      const multiplier = Math.max(0.65, currentMm / baseMm);
-      return Math.round(product.price * multiplier);
+  const defaultVariant = useMemo(() => {
+    if (initialThickness) {
+      const found = variants.find(
+        (v) => v.thickness.toLowerCase() === initialThickness.toLowerCase()
+      );
+      if (found) return found;
     }
-    return undefined;
-  }, [matchedVariant, product.price, selectedThickness]);
+    const special = variants.find((v) => v.is_special);
+    return special || variants[0] || null;
+  }, [variants, initialThickness]);
 
-  const totalPrice = unitPrice ? unitPrice * quantity : undefined;
+  const [userThickness, setUserThickness] = useState<string | null>(null);
+  const selectedThickness =
+    (userThickness && variants.some((v) => v.thickness === userThickness)
+      ? userThickness
+      : null) ||
+    defaultVariant?.thickness ||
+    product.specs.thickness.split(",")[0].trim();
+
+  const setSelectedThickness = (val: string) => {
+    setUserThickness(val);
+  };
+
+  const [quantity, setQuantity] = useState<number>(100);
+
+  const matchedVariant = useMemo(
+    () => variants.find((v) => v.thickness === selectedThickness) || null,
+    [variants, selectedThickness]
+  );
+
+  const stockStatus = matchedVariant?.stock_status || product.stock_status || "in_stock";
+  const stockQty = matchedVariant?.stock_quantity ?? product.stock_quantity ?? 120;
+  const isSpecial = Boolean(matchedVariant?.is_special);
+
+  const quoteHref = `/quote?product=${encodeURIComponent(
+    product.name
+  )}&thickness=${encodeURIComponent(selectedThickness)}&quantity=${quantity}`;
 
   return (
-    <div className="p-5 sm:p-6 rounded-3xl bg-white border border-cream-border shadow-md space-y-6">
-      <div className="flex items-center justify-between border-b border-cream-border/60 pb-3">
-        <h3 className="font-display font-bold text-base text-charcoal">
-          Configure Sheet Variant & Yard Consignment
-        </h3>
-        <span className="text-xs text-charcoal-subtle font-medium">
-          BS EN / ISO Tested
-        </span>
-      </div>
-
-      {/* 1. Thickness Variant Selector */}
-      <div className="space-y-2.5">
-        <div className="flex justify-between items-center text-xs">
-          <span className="font-bold text-charcoal">1. Select Nominal Thickness:</span>
-          <span className="text-forest font-extrabold">{selectedThickness} Calibrated</span>
+    <div className="p-6 sm:p-7 rounded-3xl bg-white border border-cream-border shadow-sm space-y-6">
+      {/* 1. Thickness Selection with Framer Motion Indicator */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <label className="text-xs font-bold uppercase tracking-wider text-charcoal-subtle flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-amber-oak" />
+            <span>Select Thickness Gauge</span>
+          </label>
+          {isSpecial && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-oak/15 border border-amber-oak/40 text-amber-900 text-[11px] font-extrabold">
+              <Sparkles className="w-3 h-3 text-amber-oak" />
+              Flagship Special Product
+            </span>
+          )}
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-          {thicknessOptions.map((t) => {
-            const isSelected = selectedThickness === t;
-            const isVUnavailable = product.variants?.some(
-              (v) => v.thickness === t && (v.stock_status === "out_of_stock" || v.stock_quantity === 0)
-            );
-
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {variants.map((variant) => {
+            const isSelected = variant.thickness === selectedThickness;
             return (
               <button
-                key={t}
+                key={variant.id}
                 type="button"
-                onClick={() => setSelectedThickness(t)}
-                className={`py-2 px-2 text-center rounded-xl text-xs font-bold transition-all relative ${
+                onClick={() => setSelectedThickness(variant.thickness)}
+                className={`relative px-3 py-3 rounded-2xl border text-left transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-oak ${
                   isSelected
-                    ? "bg-forest text-white ring-2 ring-amber-oak shadow-xs"
-                    : isVUnavailable
-                    ? "bg-cream-surface/50 text-charcoal-subtle/70 border border-dashed border-cream-border line-through"
-                    : "bg-cream-surface/70 text-charcoal hover:bg-cream-surface border border-cream-border/80"
+                    ? variant.is_special
+                      ? "border-amber-oak bg-amber-oak/10 shadow-sm"
+                      : "border-forest bg-forest/5 shadow-sm"
+                    : "border-cream-border bg-cream/40 hover:border-charcoal-subtle/40 hover:bg-white"
                 }`}
               >
-                <span>{t}</span>
                 {isSelected && (
-                  <Check className="w-3 h-3 absolute top-1 right-1 text-amber-300" />
+                  <motion.span
+                    layoutId={`active-thickness-${product.id}`}
+                    className={`absolute inset-0 rounded-2xl border-2 pointer-events-none ${
+                      variant.is_special ? "border-amber-oak" : "border-forest"
+                    }`}
+                    transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                  />
                 )}
+                <div className="relative z-10 flex items-center justify-between gap-1">
+                  <span className="text-base font-display font-extrabold text-charcoal">
+                    {variant.thickness}
+                  </span>
+                  {variant.is_special && (
+                    <Sparkles className="w-3.5 h-3.5 text-amber-oak shrink-0" />
+                  )}
+                </div>
+                <div className="relative z-10 text-[10px] font-semibold text-charcoal-subtle mt-0.5">
+                  {variant.is_special ? "Special Product" : "Standard Sheet"}
+                </div>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* 2. Sheet Size Dimension Selector */}
-      <div className="space-y-2.5">
-        <div className="flex justify-between items-center text-xs">
-          <span className="font-bold text-charcoal">2. Standard Sheet Dimension:</span>
-          <span className="text-charcoal-muted truncate max-w-[200px]">{selectedSize}</span>
-        </div>
-
-        <div className="flex gap-2 flex-wrap">
-          {sizeOptions.map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setSelectedSize(s)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                selectedSize === s
-                  ? "bg-amber-pale border border-amber-oak text-amber-900 font-bold"
-                  : "bg-cream-surface/60 border border-cream-border text-charcoal-muted hover:text-charcoal"
-              }`}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 3. Real-Time Stock Status Feedback Banner */}
-      <div className="p-3.5 rounded-2xl border text-xs">
-        {isOutOfStock ? (
-          <div className="flex items-center gap-2 text-red-800 bg-red-50 p-2 rounded-xl border border-red-200">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-red-600" />
-            <span>
-              <strong>Currently Unavailable:</strong> This specific thickness ({selectedThickness}) is fully committed at our Addis Ababa depot. Next container arrives in 14 days.
-            </span>
+      {/* 2. Sheet Size & Stock Availability */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div className="p-3.5 rounded-2xl bg-cream/60 border border-cream-border space-y-1">
+          <div className="font-bold uppercase tracking-wider text-charcoal-subtle text-[10px]">
+            Sheet Dimensions
           </div>
-        ) : isLowStock ? (
-          <div className="flex items-center gap-2 text-amber-800 bg-amber-50 p-2 rounded-xl border border-amber-200">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600" />
-            <span>
-              <strong>Low Yard Inventory:</strong> Only <strong>{stockQty} sheets</strong> remain in stock for immediate same-day delivery.
-            </span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 text-emerald-800 bg-emerald-50 p-2 rounded-xl border border-emerald-200">
-            <Check className="w-4 h-4 shrink-0 text-emerald-600" />
-            <span>
-              <strong>In Stock:</strong> {stockQty} certified sheets ready for immediate flatbed loading at Kality yard.
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* 4. Quantity Stepper & Price Calculation */}
-      <div className="pt-2 border-t border-cream-border/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        {/* Quantity Stepper */}
-        <div className="space-y-1">
-          <span className="text-[11px] font-bold text-charcoal-subtle uppercase tracking-wider block">
-            Quantity (Sheets)
-          </span>
-          <div className="flex items-center border border-cream-border rounded-xl bg-cream-surface/50 overflow-hidden shadow-2xs w-fit">
-            <button
-              type="button"
-              disabled={quantity <= 5 || isOutOfStock}
-              onClick={() => setQuantity((q) => Math.max(5, q - 5))}
-              className="p-2 hover:bg-cream-surface text-charcoal disabled:opacity-30 disabled:cursor-not-allowed"
-              aria-label="Decrease quantity"
-            >
-              <Minus className="w-3.5 h-3.5" />
-            </button>
-            <span className="px-4 py-1.5 font-display font-extrabold text-sm text-charcoal min-w-[50px] text-center">
-              {quantity}
-            </span>
-            <button
-              type="button"
-              disabled={quantity >= stockQty || isOutOfStock}
-              onClick={() => setQuantity((q) => Math.min(stockQty, q + 5))}
-              className="p-2 hover:bg-cream-surface text-charcoal disabled:opacity-30 disabled:cursor-not-allowed"
-              aria-label="Increase quantity"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
+          <div className="font-bold text-charcoal text-sm">
+            {matchedVariant?.size || product.specs.standard_size}
           </div>
         </div>
 
-        {/* Dynamic Price Display */}
-        <div className="text-right sm:text-right">
-          <span className="text-[10px] text-charcoal-subtle uppercase tracking-wider font-semibold block">
-            Estimated Batch Total:
-          </span>
-          {totalPrice ? (
-            <div>
-              <span className="font-display font-black text-2xl text-forest">
-                {totalPrice.toLocaleString()} ETB
-              </span>
-              <span className="text-[11px] text-charcoal-muted block">
-                ({unitPrice?.toLocaleString()} ETB / sheet)
-              </span>
+        <div className="p-3.5 rounded-2xl bg-cream/60 border border-cream-border space-y-1">
+          <div className="font-bold uppercase tracking-wider text-charcoal-subtle text-[10px]">
+            Werabe Factory Supply Status
+          </div>
+          {stockStatus === "out_of_stock" ? (
+            <div className="font-bold text-red-700 flex items-center gap-1.5 text-sm">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              <span>Schedule Allocation Needed</span>
+            </div>
+          ) : stockStatus === "low_stock" ? (
+            <div className="font-bold text-amber-800 flex items-center gap-1.5 text-sm">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              <span>Limited Stock ({stockQty} sheets)</span>
             </div>
           ) : (
-            <span className="text-sm font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 inline-block">
-              Price on Formal Request
-            </span>
+            <div className="font-bold text-forest flex items-center gap-1.5 text-sm">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+              <span>In Stock ({stockQty}+ sheets ready)</span>
+            </div>
           )}
         </div>
       </div>
 
-      {/* 5. Request Quote & Direct Proforma Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-3 pt-2">
-        {!isOutOfStock ? (
-          <>
-            <Button
-              href={`/quote?product=${encodeURIComponent(product.name)}&thickness=${encodeURIComponent(selectedThickness)}&quantity=${quantity}`}
-              variant="amber"
-              size="default"
-              className="flex-1 justify-center text-xs sm:text-sm font-bold shadow-md min-h-[46px]"
-              leftIcon={<FileText className="w-4 h-4" />}
-            >
-              Request Formal Proforma Quotation
-            </Button>
-
-            <a
-              href={`tel:${siteConfig.contact.phone.replace(/\s+/g, "")}`}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-cream-border bg-cream-surface/80 hover:bg-cream-surface text-charcoal font-bold text-xs sm:text-sm transition-all active:scale-95 min-h-[46px]"
-              title="Call Yard Dispatcher"
-            >
-              <Phone className="w-4 h-4 text-forest" />
-              <span>Call Yard</span>
-            </a>
-          </>
-        ) : (
-          <Button
-            href={`/quote?product=${encodeURIComponent(product.name)}&thickness=${encodeURIComponent(selectedThickness)}&quantity=${quantity}&status=restock`}
-            variant="outline"
-            size="default"
-            className="w-full justify-center text-xs sm:text-sm font-bold border-red-300 text-red-700 hover:bg-red-50 min-h-[46px]"
-            leftIcon={<Clock className="w-4 h-4" />}
+      {/* 3. Required Sheet Quantity Stepper */}
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between">
+          <label
+            htmlFor={`qty-${product.id}`}
+            className="text-xs font-bold uppercase tracking-wider text-charcoal-subtle"
           >
-            Notify Me When Restocked in Yard
-          </Button>
-        )}
+            Estimated Sheet Quantity
+          </label>
+          <div className="flex items-center gap-1.5">
+            {[50, 100, 250, 500].map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => setQuantity(preset)}
+                className={`px-2 py-0.5 rounded-md text-[11px] font-bold transition-colors ${
+                  quantity === preset
+                    ? "bg-forest text-white"
+                    : "bg-cream-dark text-charcoal-subtle hover:text-charcoal"
+                }`}
+              >
+                {preset}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <div className="flex items-center border border-cream-border rounded-xl bg-cream/50 p-1">
+            <button
+              type="button"
+              onClick={() => setQuantity((q) => Math.max(10, q - 10))}
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-charcoal hover:bg-white transition-colors"
+              aria-label="Decrease sheet quantity"
+            >
+              <Minus className="w-4 h-4" />
+            </button>
+            <input
+              id={`qty-${product.id}`}
+              type="number"
+              min={1}
+              value={quantity}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                setQuantity(Number.isNaN(val) ? 1 : Math.max(1, val));
+              }}
+              className="w-20 text-center font-display font-extrabold text-base text-charcoal bg-transparent focus:outline-none"
+            />
+            <button
+              type="button"
+              onClick={() => setQuantity((q) => q + 10)}
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-charcoal hover:bg-white transition-colors"
+              aria-label="Increase sheet quantity"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="text-xs text-charcoal-subtle">
+            <span className="font-bold text-charcoal">{product.name}</span> •{" "}
+            <span className="font-bold text-amber-oak">{selectedThickness}</span>
+            <span className="block">sheets requested</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Action Buttons */}
+      <div className="pt-2 space-y-3">
+        <Button
+          href={quoteHref}
+          variant="amber"
+          size="lg"
+          className="w-full font-bold shadow-md"
+          leftIcon={<FileText className="w-4 h-4" />}
+        >
+          Request Quote for {selectedThickness} {product.name}
+        </Button>
+
+        <div className="flex items-center justify-between gap-3 pt-1 text-xs text-charcoal-subtle">
+          <span className="flex items-center gap-1.5">
+            <Factory className="w-3.5 h-3.5 text-amber-oak" />
+            Supplied direct from Werabe &amp; Addis Ababa
+          </span>
+          <a
+            href={`tel:${siteConfig.contact.phone}`}
+            className="inline-flex items-center gap-1 font-bold text-forest hover:text-amber-oak transition-colors shrink-0"
+          >
+            <Phone className="w-3.5 h-3.5" />
+            {siteConfig.contact.phoneDisplay}
+          </a>
+        </div>
       </div>
     </div>
   );

@@ -1,21 +1,20 @@
 import React from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
-  ShieldCheck,
-  Download,
-  FileText,
-  Phone,
-  CheckCircle2,
-  ChevronRight,
-  Layers,
+  ArrowLeft,
   ArrowRight,
-  Share2,
+  Layers,
+  CheckCircle2,
+  MapPin,
+  Factory,
+  Phone,
+  FileText,
+  Sparkles,
 } from "lucide-react";
 import { siteConfig } from "@/lib/siteConfig";
-import { products, categories } from "@/data/seed-data";
+import { products } from "@/data/seed-data";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Section } from "@/components/ui/Section";
@@ -37,8 +36,8 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const resolvedParams = await params;
-  const product = products.find((p) => p.slug === resolvedParams.slug);
+  const { slug } = await params;
+  const product = products.find((p) => p.slug === slug);
 
   if (!product) {
     return {
@@ -47,50 +46,66 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${product.name} | Technical Specs & Supply`,
+    title: `${product.name} (${product.specs.thickness})`,
     description: product.short_description,
+    alternates: {
+      canonical: `${siteConfig.url}/products/${product.slug}`,
+    },
     openGraph: {
       title: `${product.name} | ${siteConfig.name}`,
       description: product.short_description,
+      images: product.images?.[0] ? [{ url: product.images[0] }] : [],
     },
   };
 }
 
+const specLabels: Record<string, string> = {
+  thickness: "Available Thicknesses",
+  standard_size: "Standard Sheet Size",
+  grade: "Panel Grade",
+  glue_type: "Bonding System",
+  core_species: "Wood Core",
+  surface_finish: "Surface Finish",
+  moisture_content: "Moisture Content",
+  origin: "Manufacturing Facility",
+};
+
 export default async function ProductDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ thickness?: string }>;
 }) {
-  const resolvedParams = await params;
-  const product = products.find((p) => p.slug === resolvedParams.slug);
+  const { slug } = await params;
+  const resolvedSearchParams = await searchParams;
+  const product = products.find((p) => p.slug === slug);
 
   if (!product) {
     notFound();
   }
 
-  const category = categories.find((c) => c.id === product.category_id);
-  const relatedProducts = products
-    .filter((p) => p.id !== product.id && p.category_id === product.category_id)
-    .concat(products.filter((p) => p.id !== product.id && p.category_id !== product.category_id))
-    .slice(0, 3);
+  const relatedProducts = products.filter((p) => p.id !== product.id);
+  const hasSpecialVariant = product.variants?.some((v) => v.is_special);
 
   const productJsonLd = {
-    "@context": "https://schema.org/",
+    "@context": "https://schema.org",
     "@type": "Product",
-    name: product.name,
-    description: product.description,
+    name: `${siteConfig.name} ${product.name}`,
+    description: product.short_description,
+    image: product.images,
     brand: {
       "@type": "Brand",
       name: siteConfig.name,
     },
-    category: product.category_name,
-    offers: {
-      "@type": "AggregateOffer",
-      priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
-      seller: {
-        "@type": "Organization",
-        name: siteConfig.name,
+    manufacturer: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: siteConfig.contact.factory.city,
+        addressRegion: siteConfig.contact.factory.region,
+        addressCountry: "ET",
       },
     },
   };
@@ -101,208 +116,193 @@ export default async function ProductDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
       />
+
       <Navbar />
-      <main className="flex-grow">
-        {/* Breadcrumb Header */}
-        <div className="bg-forest-dark text-cream py-6 bg-dark-grain border-b border-forest-light/30">
+
+      <main id="main-content" className="flex-1 bg-cream">
+        {/* Top Breadcrumb Bar */}
+        <div className="bg-white border-b border-cream-border py-4">
           <Container size="wide">
-            <div className="flex items-center gap-2 text-xs text-cream/70 flex-wrap">
-              <Link href="/" className="hover:text-white transition-colors">
-                Home
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-xs text-charcoal-subtle">
+                <Link href="/" className="hover:text-forest transition-colors">
+                  Home
+                </Link>
+                <span>/</span>
+                <Link href="/products" className="hover:text-forest transition-colors">
+                  Products
+                </Link>
+                <span>/</span>
+                <span className="font-semibold text-charcoal">{product.name}</span>
+              </div>
+
+              <Link
+                href="/products"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-forest hover:text-amber-oak transition-colors"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Back to Catalog</span>
               </Link>
-              <ChevronRight className="w-3.5 h-3.5 text-amber-light/70" />
-              <Link href="/products" className="hover:text-white transition-colors">
-                Products
-              </Link>
-              <ChevronRight className="w-3.5 h-3.5 text-amber-light/70" />
-              {category && (
-                <>
-                  <Link
-                    href={`/products?category=${category.slug}`}
-                    className="hover:text-white transition-colors"
-                  >
-                    {category.name}
-                  </Link>
-                  <ChevronRight className="w-3.5 h-3.5 text-amber-light/70" />
-                </>
-              )}
-              <span className="text-amber-light font-medium truncate max-w-xs">
-                {product.name}
-              </span>
             </div>
           </Container>
         </div>
 
-        {/* Main Product Showcase Section */}
-        <Section variant="cream" woodgrain padded="default">
+        {/* Main Product Section */}
+        <Section className="py-10 lg:py-16">
           <Container size="wide">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-              {/* Left Column: Interactive Architectural Gallery Rail & Stage */}
-              <div className="lg:col-span-5 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+              {/* Left: Product Gallery */}
+              <div className="lg:col-span-6 space-y-6">
                 <ProductGalleryRail product={product} />
 
-                {/* Direct Spec Sheet Download Card */}
-                <div className="bg-white rounded-2xl border border-cream-border p-5 flex items-center justify-between gap-4 shadow-xs">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-forest/5 text-forest flex items-center justify-center shrink-0">
-                      <Download className="w-5 h-5 text-amber-oak" />
+                {/* Origin & Availability Summary */}
+                <div className="p-5 rounded-2xl bg-white border border-cream-border grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-amber-oak/10 text-amber-oak flex items-center justify-center shrink-0">
+                      <Factory className="w-4 h-4" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-charcoal">
-                        Technical Spec Sheet (PDF)
-                      </h4>
-                      <p className="text-[11px] text-charcoal-muted">
-                        Official laboratory & test data
-                      </p>
+                      <div className="font-bold text-charcoal">Werabe Factory Production</div>
+                      <div className="text-charcoal-subtle">{siteConfig.contact.factory.full}</div>
                     </div>
                   </div>
-                  <Button
-                    href={`/quote?product=${encodeURIComponent(product.name)}`}
-                    variant="secondary"
-                    size="sm"
-                    className="text-xs font-bold"
-                  >
-                    Request PDF
-                  </Button>
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-forest/10 text-forest flex items-center justify-center shrink-0">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-charcoal">Addis Ababa Office</div>
+                      <div className="text-charcoal-subtle">{siteConfig.contact.address.full}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Right Column: Title, Specs Table, Applications */}
-              <div className="lg:col-span-7 space-y-8">
-                {/* Product Header */}
+              {/* Right: Overview & Variant Selector */}
+              <div className="lg:col-span-6 space-y-7">
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="forest" size="default">
-                      {product.category_name}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="amber" size="default">
+                      {product.category_name || product.name}
                     </Badge>
-                    <span className="text-xs text-charcoal-muted">
-                      Standard Size: {product.specs.standard_size}
-                    </span>
+                    {hasSpecialVariant && (
+                      <Badge
+                        variant="forest"
+                        size="default"
+                        className="bg-amber-oak text-white border-amber-oak"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 mr-1 inline" />
+                        Includes 18mm Special Product
+                      </Badge>
+                    )}
                   </div>
 
-                  <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-charcoal tracking-tight">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-extrabold text-charcoal tracking-tight">
                     {product.name}
                   </h1>
 
-                  <p className="text-base text-charcoal-muted leading-relaxed">
+                  <p className="text-base text-charcoal-light leading-relaxed">
                     {product.description}
                   </p>
                 </div>
 
-                {/* Interactive Variant Configurator & Yard Quoting Stage */}
-                <ProductVariantSelector product={product} />
+                {/* Thickness Selector (No Pricing) */}
+                <ProductVariantSelector
+                  product={product}
+                  initialThickness={resolvedSearchParams?.thickness}
+                />
 
-                {/* Technical Specifications Table */}
-                <div className="space-y-4">
-                  <h3 className="font-display text-xl font-bold text-charcoal">
-                    Technical Specifications
-                  </h3>
-
-                  <div className="bg-white rounded-2xl border border-cream-border overflow-hidden shadow-xs divide-y divide-cream-border/70 text-xs sm:text-sm">
-                    <div className="grid grid-cols-3 p-4">
-                      <span className="font-semibold text-charcoal-muted">
-                        Standard Thicknesses
-                      </span>
-                      <span className="col-span-2 font-medium text-charcoal">
-                        {product.specs.thickness}
-                      </span>
+                {/* Direct Contact Box */}
+                <div className="p-5 rounded-2xl bg-forest-dark text-cream border border-forest-light/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <div className="text-xs font-bold uppercase tracking-wider text-amber-light">
+                      Direct Order &amp; Dispatch Inquiry
                     </div>
-
-                    <div className="grid grid-cols-3 p-4 bg-cream-surface/30">
-                      <span className="font-semibold text-charcoal-muted">
-                        Panel Dimensions
-                      </span>
-                      <span className="col-span-2 font-medium text-charcoal">
-                        {product.specs.standard_size}
-                      </span>
+                    <div className="text-sm text-cream/85">
+                      Call {siteConfig.contact.phoneDisplay} (Call / WhatsApp / Telegram) for volume allocation.
                     </div>
-
-                    <div className="grid grid-cols-3 p-4">
-                      <span className="font-semibold text-charcoal-muted">
-                        Grading Standard
-                      </span>
-                      <span className="col-span-2 font-medium text-charcoal">
-                        {product.specs.grade}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-3 p-4 bg-cream-surface/30">
-                      <span className="font-semibold text-charcoal-muted">
-                        Glue & Adhesive Bond
-                      </span>
-                      <span className="col-span-2 font-medium text-charcoal">
-                        {product.specs.glue_type}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-3 p-4">
-                      <span className="font-semibold text-charcoal-muted">
-                        Core Veneer Species
-                      </span>
-                      <span className="col-span-2 font-medium text-charcoal">
-                        {product.specs.core_species}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-3 p-4 bg-cream-surface/30">
-                      <span className="font-semibold text-charcoal-muted">
-                        Surface Finish & Texture
-                      </span>
-                      <span className="col-span-2 font-medium text-charcoal">
-                        {product.specs.surface_finish}
-                      </span>
-                    </div>
-
-                    {product.specs.density && (
-                      <div className="grid grid-cols-3 p-4">
-                        <span className="font-semibold text-charcoal-muted">
-                          Nominal Density
-                        </span>
-                        <span className="col-span-2 font-medium text-charcoal">
-                          {product.specs.density}
-                        </span>
-                      </div>
-                    )}
-
-                    {product.specs.moisture_content && (
-                      <div className="grid grid-cols-3 p-4 bg-cream-surface/30">
-                        <span className="font-semibold text-charcoal-muted">
-                          Moisture Content
-                        </span>
-                        <span className="col-span-2 font-medium text-charcoal">
-                          {product.specs.moisture_content}
-                        </span>
-                      </div>
-                    )}
-
-                    {product.specs.formaldehyde_emission && (
-                      <div className="grid grid-cols-3 p-4">
-                        <span className="font-semibold text-charcoal-muted">
-                          Emission Standard
-                        </span>
-                        <span className="col-span-2 font-medium text-charcoal">
-                          {product.specs.formaldehyde_emission}
-                        </span>
-                      </div>
-                    )}
                   </div>
+                  <Button
+                    href={`tel:${siteConfig.contact.phone}`}
+                    variant="amber"
+                    size="sm"
+                    leftIcon={<Phone className="w-4 h-4" />}
+                    className="shrink-0"
+                  >
+                    Call Office
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Container>
+        </Section>
+
+        {/* Technical Specs & Applications */}
+        <Section className="bg-white border-y border-cream-border py-14 lg:py-20">
+          <Container size="wide">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+              {/* Specifications Table */}
+              <div className="lg:col-span-7 space-y-5">
+                <div className="flex items-center gap-2.5">
+                  <Layers className="w-5 h-5 text-amber-oak" />
+                  <h2 className="text-2xl font-display font-extrabold text-charcoal">
+                    Panel Specifications
+                  </h2>
                 </div>
 
-                {/* Primary Industry Applications */}
-                <div className="space-y-4">
-                  <h3 className="font-display text-xl font-bold text-charcoal">
-                    Recommended Applications
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {product.applications.map((app, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-3 p-3.5 rounded-xl bg-white border border-cream-border shadow-xs text-xs font-semibold text-charcoal"
-                      >
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span>{app}</span>
-                      </div>
+                <div className="rounded-2xl border border-cream-border overflow-hidden bg-cream/30">
+                  <dl className="divide-y divide-cream-border">
+                    {Object.entries(product.specs).map(([key, value]) => {
+                      if (!value) return null;
+                      const label =
+                        specLabels[key] ||
+                        key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+                      return (
+                        <div
+                          key={key}
+                          className="grid grid-cols-1 sm:grid-cols-5 px-5 py-3.5 text-sm hover:bg-white transition-colors"
+                        >
+                          <dt className="sm:col-span-2 font-semibold text-charcoal-subtle">
+                            {label}
+                          </dt>
+                          <dd className="sm:col-span-3 font-medium text-charcoal mt-0.5 sm:mt-0">
+                            {value}
+                          </dd>
+                        </div>
+                      );
+                    })}
+                  </dl>
+                </div>
+              </div>
+
+              {/* Practical Applications */}
+              <div className="lg:col-span-5 space-y-5">
+                <div className="flex items-center gap-2.5">
+                  <FileText className="w-5 h-5 text-amber-oak" />
+                  <h2 className="text-2xl font-display font-extrabold text-charcoal">
+                    Recommended Uses
+                  </h2>
+                </div>
+
+                <div className="p-6 rounded-2xl bg-cream/60 border border-cream-border space-y-4">
+                  <ul className="space-y-3.5">
+                    {product.applications.map((app) => (
+                      <li key={app} className="flex items-start gap-3 text-sm text-charcoal">
+                        <CheckCircle2 className="w-4 h-4 text-amber-oak shrink-0 mt-1" />
+                        <span className="leading-relaxed">{app}</span>
+                      </li>
                     ))}
+                  </ul>
+
+                  <div className="pt-3 border-t border-cream-border">
+                    <Button
+                      href={`/quote?product=${encodeURIComponent(product.name)}`}
+                      variant="primary"
+                      className="w-full"
+                      rightIcon={<ArrowRight className="w-4 h-4" />}
+                    >
+                      Request Quote for {product.name}
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -310,42 +310,33 @@ export default async function ProductDetailPage({
           </Container>
         </Section>
 
-        {/* Related Products Carousel / Grid */}
+        {/* Companion Product */}
         {relatedProducts.length > 0 && (
-          <Section variant="cream-surface" padded="default" className="border-t border-cream-border/70">
+          <Section className="bg-cream py-14 lg:py-20">
             <Container size="wide">
-              <div className="flex items-end justify-between mb-10">
-                <div className="space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber-oak">
-                    Alternative Specifications
-                  </span>
-                  <h2 className="font-display text-2xl sm:text-3xl font-bold text-charcoal">
-                    Related Timber Panels
-                  </h2>
-                </div>
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-2xl font-display font-extrabold text-charcoal">
+                  Other Product in Our Lineup
+                </h2>
                 <Link
                   href="/products"
-                  className="text-xs font-bold text-forest hover:text-amber-oak transition-colors flex items-center gap-1"
+                  className="text-xs font-bold text-amber-oak hover:underline inline-flex items-center gap-1"
                 >
-                  <span>All Products</span>
+                  <span>Full Lineup</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
-
-              {/* Responsive Timber Panel Rail on Mobile / Grid on Desktop */}
-              <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 overflow-x-auto sm:overflow-visible pb-4 sm:pb-0 scrollbar-none -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory">
-                {relatedProducts.map((p) => (
-                  <div key={p.id} className="min-w-[270px] sm:min-w-0 snap-start flex-1 flex flex-col">
-                    <ProductCard product={p} />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+                {relatedProducts.map((rel) => (
+                  <ProductCard key={rel.id} product={rel} />
                 ))}
               </div>
             </Container>
           </Section>
         )}
       </main>
+
       <Footer />
     </>
   );
 }
-

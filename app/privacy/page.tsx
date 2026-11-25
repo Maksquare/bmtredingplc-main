@@ -7,64 +7,59 @@ import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | Commercial Data Protection",
-  description: `Privacy policy and commercial information handling practices for ${siteConfig.name}.`,
+  title: "Privacy Policy",
+  description: `Privacy Policy for ${siteConfig.name} commercial inquiry and quotation services.`,
+  alternates: {
+    canonical: `${siteConfig.url}/privacy`,
+  },
 };
 
 export default function PrivacyPage() {
   return (
     <>
       <Navbar />
-      <main className="flex-grow">
-        <div className="bg-forest-dark text-cream py-14 bg-dark-grain border-b border-forest-light/30">
-          <Container size="default">
-            <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-white">
-              Privacy & Data Policy
-            </h1>
-            <p className="text-xs sm:text-sm text-cream/70 mt-2">
-              Last revised: February 2026 • {siteConfig.name}
-            </p>
-          </Container>
-        </div>
-
-        <Section variant="cream" woodgrain padded="default">
-          <Container size="default">
-            <div className="bg-white rounded-3xl border border-cream-border p-8 sm:p-12 shadow-sm space-y-6 text-sm text-charcoal-muted leading-relaxed max-w-3xl mx-auto">
-              <section className="space-y-2">
-                <h2 className="font-display text-xl font-bold text-charcoal">
-                  1. Information We Collect
-                </h2>
-                <p>
-                  At <strong className="text-charcoal">{siteConfig.name}</strong>, we collect business contact details, email addresses, phone numbers, and structural Bill of Quantities (BOQ) specifications submitted via our online quote forms, telephone inquiries, and central warehouse gate visits.
+      <main id="main-content" className="flex-1 bg-cream py-16 lg:py-24">
+        <Section>
+          <Container size="narrow">
+            <div className="space-y-8 bg-white p-8 sm:p-12 rounded-3xl border border-cream-border shadow-sm">
+              <div className="space-y-2 border-b border-cream-border pb-6">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-oak">
+                  Legal Documentation
+                </span>
+                <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-charcoal">
+                  Privacy Policy
+                </h1>
+                <p className="text-xs text-charcoal-subtle">
+                  Effective: {siteConfig.name} • Office: {siteConfig.contact.address.full}
                 </p>
-              </section>
+              </div>
 
-              <section className="space-y-2">
-                <h2 className="font-display text-xl font-bold text-charcoal">
-                  2. Purpose of Processing
-                </h2>
-                <p>
-                  Your corporate information is utilized exclusively for generating accurate wholesale proforma invoices, scheduling jobsite flatbed crane deliveries, confirming customs and phytosanitary documentation, and providing after-sales engineering support. We do not sell, rent, or lease contractor lists to any third parties.
-                </p>
-              </section>
+              <div className="space-y-6 text-sm text-charcoal-light leading-relaxed">
+                <div className="space-y-2">
+                  <h2 className="text-lg font-display font-bold text-charcoal">1. Information We Collect</h2>
+                  <p>
+                    When you request a quote or submit an inquiry on {siteConfig.name}, we collect only the contact details and product requirements you provide — such as your name, company name, telephone number, email address, delivery location, and selected Safarian or Plywood specifications.
+                  </p>
+                </div>
 
-              <section className="space-y-2">
-                <h2 className="font-display text-xl font-bold text-charcoal">
-                  3. Data Security & Storage
-                </h2>
-                <p>
-                  Uploaded specification documents and client records are stored securely on our dedicated cPanel hosting infrastructure in compliance with industry encryption standards. Access is restricted to authorized {siteConfig.name} commercial account managers.
-                </p>
-              </section>
+                <div className="space-y-2">
+                  <h2 className="text-lg font-display font-bold text-charcoal">2. How We Use Information</h2>
+                  <p>
+                    Submitted details are used solely to respond to your inquiry, confirm sheet availability across Safarian (03mm, 06mm, 08mm, 12mm) and Plywood (16mm and 18mm special product), and coordinate supply from our Werabe City factory or Addis Ababa office. We do not sell or rent client contact records to third parties.
+                  </p>
+                </div>
 
-              <section className="space-y-2">
-                <h2 className="font-display text-xl font-bold text-charcoal">
-                  4. Contacting Data Protection Desk
-                </h2>
-                <p>
-                  For inquiries regarding your commercial account records or to request removal from our technical bulletin, please email <a href={`mailto:${siteConfig.contact.email}`} className="text-amber-oak font-semibold">{siteConfig.contact.email}</a>.
-                </p>
-              </section>
+                <div className="space-y-2">
+                  <h2 className="text-lg font-display font-bold text-charcoal">3. Contact for Data Inquiries</h2>
+                  <p>
+                    To update or remove your inquiry details, contact our Addis Ababa office at {siteConfig.contact.address.full}, call {siteConfig.contact.phoneDisplay}, or email{" "}
+                    <a href={`mailto:${siteConfig.contact.email}`} className="text-amber-oak font-medium hover:underline">
+                      {siteConfig.contact.email}
+                    </a>
+                    .
+                  </p>
+                </div>
+              </div>
             </div>
           </Container>
         </Section>
@@ -73,4 +68,3 @@ export default function PrivacyPage() {
     </>
   );
 }
-

@@ -4,12 +4,10 @@ import {
   MapPin,
   Phone,
   Mail,
-  Clock,
+  Factory,
   MessageSquare,
   Send,
-  Building2,
-  ShieldCheck,
-  CheckCircle2,
+  ArrowUpRight,
 } from "lucide-react";
 import { siteConfig } from "@/lib/siteConfig";
 import { Navbar } from "@/components/layout/Navbar";
@@ -19,178 +17,208 @@ import { Container } from "@/components/ui/Container";
 import { ContactForm } from "@/components/forms/ContactForm";
 
 export const metadata: Metadata = {
-  title: "Contact Central Yard & Sales Desk • Addis Ababa, Ethiopia | bmtradingplc",
-  description: `Contact ${siteConfig.name} in Addis Ababa, Ethiopia for wholesale plywood pricing, container logistics, sample specimens, and warehouse gate collection details.`,
+  title: "Contact Us",
+  description: `Contact ${siteConfig.name} at our Addis Ababa office (Ayer Tena, Shamo Tower, 3rd Floor) or Werabe City factory. Call 0911 247 821, 0911 221 261, or 0910 953 373.`,
+  alternates: {
+    canonical: `${siteConfig.url}/contact`,
+  },
 };
 
 export default function ContactPage() {
+  const phoneLines = [
+    {
+      label: "Primary Phone, WhatsApp & Telegram",
+      display: siteConfig.contact.phoneDisplay,
+      tel: siteConfig.contact.phone,
+      highlight: true,
+    },
+    {
+      label: "Secondary Sales Line",
+      display: siteConfig.contact.secondaryPhoneDisplay,
+      tel: siteConfig.contact.secondaryPhone,
+      highlight: false,
+    },
+    {
+      label: "Direct Office Line",
+      display: siteConfig.contact.tertiaryPhoneDisplay,
+      tel: siteConfig.contact.tertiaryPhone,
+      highlight: false,
+    },
+  ];
+
   return (
     <>
       <Navbar />
-      <main className="flex-grow">
-        {/* Page Hero Header with High Contrast */}
-        <div className="bg-[#0B241B] text-white py-16 lg:py-20 bg-dark-grain border-b border-white/15 relative">
-          <Container size="wide">
-            <div className="max-w-3xl space-y-3.5">
-              <span className="text-xs font-bold uppercase tracking-widest text-amber-400 bg-white/10 px-4 py-1.5 rounded-full border border-white/20 inline-block shadow-sm">
-                Direct Sales & Distribution Yard • Addis Ababa, Ethiopia
-              </span>
-              <h1 className="font-display text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-                Connect with our Timber Specialists
+
+      <main id="main-content" className="flex-1 bg-cream">
+        {/* Header */}
+        <section className="relative bg-forest-dark text-cream py-16 lg:py-24 overflow-hidden bg-dark-grain border-b border-forest-light/30">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-amber-oak/15 rounded-full blur-3xl pointer-events-none" />
+          <Container size="wide" className="relative z-10">
+            <div className="max-w-3xl space-y-5">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-forest-surface border border-forest-light/40 text-xs font-bold tracking-widest uppercase text-amber-light">
+                <Phone className="w-3.5 h-3.5 text-amber-light" />
+                <span>Direct Sales &amp; Coordination</span>
+              </div>
+              <h1 className="text-4xl sm:text-5xl font-display font-extrabold text-white tracking-tight">
+                Contact {siteConfig.name}
               </h1>
-              <p className="text-base sm:text-lg text-white/90 leading-relaxed font-normal">
-                Whether you need a full container of BS 1088 marine plywood or urgent jobsite flatbed dispatch of film-faced formwork across Addis Ababa and surrounding regions, our commercial sales desk is ready to assist.
+              <p className="text-base sm:text-lg text-cream/80 leading-relaxed max-w-2xl">
+                Reach our Addis Ababa office or Werabe manufacturing team to inquire about Safarian boards (03mm, 06mm, 08mm, 12mm) and Plywood (16mm &amp; 18mm special product).
               </p>
             </div>
           </Container>
-        </div>
+        </section>
 
-        {/* Contact Layout */}
-        <Section variant="cream" woodgrain padded="default">
+        {/* Contact Grid */}
+        <Section className="py-16 lg:py-24">
           <Container size="wide">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-              {/* Left Column: Direct Contact Details & Click-to-Chat */}
-              <div className="lg:col-span-5 space-y-8">
-                <div className="space-y-3">
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber-oak bg-amber-pale px-3.5 py-1.5 rounded-full border border-amber-light/40 inline-block">
-                    Headquarters & Central Yard
-                  </span>
-                  <h2 className="font-display text-3xl font-extrabold text-charcoal">
-                    {siteConfig.name} Addis Ababa
-                  </h2>
-                  <p className="text-sm text-charcoal-muted leading-relaxed font-medium">
-                    Strategically located in Addis Ababa&apos;s commercial corridor for rapid customs container de-stuffing, regional transport hub clearance, and immediate jobsite flatbed loading.
-                  </p>
-                </div>
-
-                {/* Contact Cards List with High Contrast */}
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-cream-border shadow-sm">
-                    <div className="w-12 h-12 rounded-xl bg-forest/10 text-amber-oak flex items-center justify-center shrink-0 mt-0.5">
-                      <MapPin className="w-6 h-6" />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+              {/* Left Column: Locations & Phone Numbers */}
+              <div className="lg:col-span-5 space-y-5">
+                {/* Office Address Card */}
+                <div className="p-6 rounded-2xl bg-white border border-cream-border shadow-xs space-y-3 hover:border-amber-oak/40 transition-colors">
+                  <div className="flex items-start gap-4">
+                    <div className="w-11 h-11 rounded-xl bg-amber-oak/10 border border-amber-oak/20 flex items-center justify-center text-amber-oak shrink-0">
+                      <MapPin className="w-5 h-5" />
                     </div>
-                    <div>
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
-                        Central Yard Location
-                      </h4>
-                      <p className="text-sm font-bold text-charcoal mt-1 leading-snug">
+                    <div className="space-y-1">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-oak">
+                        Head Office
+                      </span>
+                      <h2 className="text-lg font-display font-bold text-charcoal">
+                        Addis Ababa, Ayer Tena
+                      </h2>
+                      <p className="text-sm text-charcoal-light font-medium">
                         {siteConfig.contact.address.full}
                       </p>
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-cream-border shadow-sm">
-                    <div className="w-12 h-12 rounded-xl bg-forest/10 text-amber-oak flex items-center justify-center shrink-0 mt-0.5">
-                      <Phone className="w-6 h-6" />
+                {/* Factory Location Card */}
+                <div className="p-6 rounded-2xl bg-white border border-cream-border shadow-xs space-y-3 hover:border-amber-oak/40 transition-colors">
+                  <div className="flex items-start gap-4">
+                    <div className="w-11 h-11 rounded-xl bg-forest/10 border border-forest/20 flex items-center justify-center text-forest shrink-0">
+                      <Factory className="w-5 h-5" />
                     </div>
-                    <div>
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
-                        Contractor Sales Desk & Hotline
-                      </h4>
-                      <a
-                        href={`tel:${siteConfig.contact.phone.replace(/\s+/g, "")}`}
-                        className="text-base font-extrabold text-charcoal hover:text-amber-oak transition-colors block mt-1"
-                      >
-                        {siteConfig.contact.phoneDisplay}
-                      </a>
-                      <p className="text-xs text-charcoal-muted mt-0.5">
-                        Landline: {siteConfig.contact.landline}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-cream-border shadow-sm">
-                    <div className="w-12 h-12 rounded-xl bg-forest/10 text-amber-oak flex items-center justify-center shrink-0 mt-0.5">
-                      <Mail className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
-                        Official Correspondence
-                      </h4>
-                      <a
-                        href={`mailto:${siteConfig.contact.email}`}
-                        className="text-sm font-extrabold text-charcoal hover:text-amber-oak transition-colors block mt-1"
-                      >
-                        {siteConfig.contact.email}
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-cream-border shadow-sm">
-                    <div className="w-12 h-12 rounded-xl bg-forest/10 text-amber-oak flex items-center justify-center shrink-0 mt-0.5">
-                      <Clock className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-charcoal-subtle">
-                        Warehouse Operating Hours
-                      </h4>
-                      <p className="text-xs font-bold text-charcoal leading-relaxed mt-1">
-                        {siteConfig.contact.hours}
+                    <div className="space-y-1">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-forest">
+                        Factory Location
+                      </span>
+                      <h2 className="text-lg font-display font-bold text-charcoal">
+                        Central Ethiopia, Werabe City
+                      </h2>
+                      <p className="text-sm text-charcoal-light">
+                        Manufacturing facility producing Safarian boards and structural Plywood sheets.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Instant Messaging Strip */}
-                <div className="space-y-3 pt-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-charcoal">
-                    Direct Instant Messaging Channels:
-                  </h4>
+                {/* All 3 Phone Numbers */}
+                <div className="p-6 rounded-2xl bg-white border border-cream-border shadow-xs space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-oak/10 border border-amber-oak/20 flex items-center justify-center text-amber-oak shrink-0">
+                      <Phone className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-oak">
+                        Phone Lines
+                      </span>
+                      <h2 className="text-lg font-display font-bold text-charcoal">
+                        Direct Telephone Numbers
+                      </h2>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {phoneLines.map((line) => (
+                      <a
+                        key={line.tel}
+                        href={`tel:${line.tel}`}
+                        className="flex items-center justify-between p-3.5 rounded-xl border border-cream-border bg-cream/40 hover:bg-cream hover:border-amber-oak/50 transition-all group"
+                      >
+                        <div>
+                          <div className="text-xs font-semibold text-charcoal-subtle">
+                            {line.label}
+                          </div>
+                          <div className="text-base font-display font-extrabold text-charcoal group-hover:text-forest transition-colors">
+                            {line.display}
+                          </div>
+                        </div>
+                        <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-oak group-hover:translate-x-0.5 transition-transform">
+                          Call <ArrowUpRight className="w-3.5 h-3.5" />
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+
+                {/* WhatsApp, Telegram & Email Card */}
+                <div className="p-6 rounded-2xl bg-forest-dark text-cream border border-forest-light/30 space-y-4 shadow-md">
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-amber-light">
+                      Messaging &amp; Email
+                    </span>
+                    <h2 className="text-lg font-display font-bold text-white">
+                      Chat Instantly on {siteConfig.contact.phoneDisplay}
+                    </h2>
+                    <p className="text-xs text-cream/75">
+                      Use our primary number ({siteConfig.contact.phoneDisplay}) on WhatsApp or Telegram to discuss stock availability and sheet thicknesses.
+                    </p>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-3">
                     <a
-                      href={`https://wa.me/${siteConfig.contact.whatsapp.replace(/[^0-9]/g, "")}?text=Hello%20bmtradingplc,%20I%20would%20like%20to%20inquire%20about%20plywood%20supply%20in%20Ethiopia.`}
+                      href={`https://wa.me/${siteConfig.contact.whatsapp.replace(/[^0-9]/g, "")}?text=Hello%20bmtradingplc,%20I%20would%20like%20to%20inquire%20about%20Safarian%20and%20Plywood%20supply.`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold shadow-md transition-all"
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#128C7E] hover:bg-[#075E54] text-white text-xs font-bold transition-all active:scale-[0.98]"
                     >
-                      <MessageSquare className="w-4 h-4 text-emerald-200" />
-                      <span>WhatsApp Chat</span>
+                      <MessageSquare className="w-4 h-4" />
+                      <span>WhatsApp</span>
                     </a>
-
                     <a
-                      href={`https://t.me/${siteConfig.contact.telegram}`}
+                      href={siteConfig.contact.telegramUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md transition-all"
+                      className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#229ED9] hover:bg-[#1982b8] text-white text-xs font-bold transition-all active:scale-[0.98]"
                     >
-                      <Send className="w-4 h-4 text-sky-200" />
-                      <span>Telegram Direct</span>
+                      <Send className="w-4 h-4" />
+                      <span>Telegram</span>
                     </a>
                   </div>
-                </div>
 
-                {/* Trust Guarantee Box */}
-                <div className="p-5 rounded-2xl bg-[#0B241B] text-white border border-white/15 space-y-2.5 shadow-md">
-                  <div className="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider">
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>Direct Mill Import Guarantee</span>
-                  </div>
-                  <p className="text-xs text-white/85 leading-relaxed">
-                    All consignments stored in our Addis Ababa yards include batch test certificates, zero core void guarantees, and verified boiling-water-proof phenolic resin testing reports.
-                  </p>
+                  <a
+                    href={`mailto:${siteConfig.contact.email}`}
+                    className="flex items-center gap-2.5 pt-2 border-t border-white/10 text-xs text-cream/85 hover:text-amber-light transition-colors"
+                  >
+                    <Mail className="w-4 h-4 text-amber-light shrink-0" />
+                    <span>{siteConfig.contact.email}</span>
+                  </a>
                 </div>
               </div>
 
-              {/* Right Column: Commercial Inquiry Form */}
+              {/* Right Column: Contact Form */}
               <div className="lg:col-span-7">
-                <div className="mb-5 space-y-1">
-                  <span className="text-xs font-bold uppercase tracking-widest text-amber-oak bg-amber-pale px-3.5 py-1 rounded-full border border-amber-light/40 inline-block">
-                    Electronic RFQ Specification
-                  </span>
-                  <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-charcoal">
-                    Request a Direct Wholesale Quotation
-                  </h3>
-                  <p className="text-xs text-charcoal-muted">
-                    Submit your sheet requirements, core specs, or BOQ cutting schedules for a stamped proforma.
-                  </p>
+                <div className="p-6 sm:p-8 lg:p-10 rounded-3xl bg-white border border-cream-border shadow-xl">
+                  <div className="mb-6 space-y-1.5">
+                    <h2 className="text-2xl font-display font-extrabold text-charcoal">
+                      Send Us a Message
+                    </h2>
+                    <p className="text-sm text-charcoal-light">
+                      Tell us which Safarian or Plywood thicknesses you require and our team will get back to you promptly.
+                    </p>
+                  </div>
+                  <ContactForm />
                 </div>
-
-                <ContactForm />
               </div>
             </div>
           </Container>
         </Section>
       </main>
+
       <Footer />
     </>
   );

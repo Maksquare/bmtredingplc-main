@@ -1,6 +1,6 @@
 /**
  * bmtradingplc - Master Site Configuration
- * 
+ *
  * CRITICAL NAMING RULE:
  * The company name is exactly "bmtradingplc".
  * Never split, rewrite, or autocorrect it.
@@ -12,25 +12,36 @@ export const siteConfig = {
   domain: "bmtradingplc.com",
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://bmtradingplc.com",
   assetsUrl: process.env.NEXT_PUBLIC_ASSETS_BASE_URL || "https://files.bmtradingplc.com",
-  description: "Ethiopia's premier direct importer and wholesale supplier of certified marine plywood, high-cycle film-faced shuttering panels, architectural hardwoods, and engineered timber solutions.",
-  tagline: "Architectural Timber & Industrial Plywood Solutions",
+  description:
+    "Over 10 years supplying Safarian boards (03mm, 06mm, 08mm, 12mm) and precision Plywood (16mm and 18mm special product) from our Werabe factory and Addis Ababa office.",
+  tagline: "Safarian Boards & Structural Plywood Solutions",
   country: "Ethiopia",
   contact: {
     email: "info@bmtradingplc.com",
     salesEmail: "sales@bmtradingplc.com",
-    phone: "+251 911 234 567",
-    phoneDisplay: "+251 911 234 567",
-    landline: "+251 11 667 8900",
-    whatsapp: "+251911234567",
-    telegram: "bmtradingplc",
+    phone: "+251911247821",
+    phoneDisplay: "0911 247 821",
+    secondaryPhone: "+251911221261",
+    secondaryPhoneDisplay: "0911 221 261",
+    tertiaryPhone: "+251910953373",
+    tertiaryPhoneDisplay: "0910 953 373",
+    whatsapp: "+251911247821",
+    telegram: "+251911247821",
+    telegramUrl: "https://t.me/+251911247821",
     address: {
-      street: "Bole Sub-City, Woreda 03, Industrial Commercial Corridor",
+      street: "Ayer Tena, Shamo Tower, 3rd Floor",
       city: "Addis Ababa",
       region: "Addis Ababa",
       country: "Ethiopia",
-      full: "Bole Sub-City, Woreda 03, Industrial Commercial Corridor, Addis Ababa, Ethiopia",
+      full: "Addis Ababa, Ayer Tena, Shamo Tower, 3rd Floor",
     },
-    hours: "Monday – Friday: 08:00 – 17:30 | Saturday: 08:30 – 13:00 (EAT)",
+    factory: {
+      city: "Werabe City",
+      region: "Central Ethiopia",
+      country: "Ethiopia",
+      full: "Central Ethiopia, Werabe City",
+    },
+    hours: "Monday – Saturday: 08:30 – 17:30 (EAT)",
   },
   social: {
     linkedin: "https://linkedin.com/company/bmtradingplc",
@@ -39,17 +50,14 @@ export const siteConfig = {
     twitter: "https://twitter.com/bmtradingplc",
   },
   stats: [
-    { label: "Years of Supply Reliability", value: 18, suffix: "+" },
-    { label: "Metric Tons Delivered", value: 120, suffix: "K+" },
-    { label: "Major Infrastructure Clients", value: 450, suffix: "+" },
-    { label: "Quality Standard Compliance", value: 100, suffix: "%" },
+    { label: "Years of Industry Experience", value: 10, suffix: "+" },
+    { label: "Trusted Clients Served", value: 200, suffix: "+" },
+    { label: "Quality Standards", value: 100, suffix: "%" },
   ],
   navLinks: [
     { name: "Home", href: "/" },
     { name: "About Us", href: "/about" },
     { name: "Products", href: "/products" },
-    { name: "Applications", href: "/services" },
-    { name: "Projects", href: "/gallery" },
     { name: "Contact", href: "/contact" },
   ],
 };

@@ -7,64 +7,62 @@ import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 
 export const metadata: Metadata = {
-  title: "Terms of Supply & Quotation | Commercial Guidelines",
-  description: `Commercial terms of timber and plywood supply, dispatch conditions, and warranty specifications for ${siteConfig.name}.`,
+  title: "Terms of Supply",
+  description: `General commercial supply terms for Safarian and Plywood supplied by ${siteConfig.name}.`,
+  alternates: {
+    canonical: `${siteConfig.url}/terms`,
+  },
 };
 
 export default function TermsPage() {
   return (
     <>
       <Navbar />
-      <main className="flex-grow">
-        <div className="bg-forest-dark text-cream py-14 bg-dark-grain border-b border-forest-light/30">
-          <Container size="default">
-            <h1 className="font-display text-3xl sm:text-4xl font-extrabold text-white">
-              Terms of Timber Supply & Proforma Conditions
-            </h1>
-            <p className="text-xs sm:text-sm text-cream/70 mt-2">
-              Standard Commercial Conditions • {siteConfig.name}
-            </p>
-          </Container>
-        </div>
-
-        <Section variant="cream" woodgrain padded="default">
-          <Container size="default">
-            <div className="bg-white rounded-3xl border border-cream-border p-8 sm:p-12 shadow-sm space-y-6 text-sm text-charcoal-muted leading-relaxed max-w-3xl mx-auto">
-              <section className="space-y-2">
-                <h2 className="font-display text-xl font-bold text-charcoal">
-                  1. Quotation Validity
-                </h2>
-                <p>
-                  All written proforma quotations issued by <strong className="text-charcoal">{siteConfig.name}</strong> remain valid for 14 calendar days from the date of transmission, subject to ongoing container availability and international ocean freight adjustments.
+      <main id="main-content" className="flex-1 bg-cream py-16 lg:py-24">
+        <Section>
+          <Container size="narrow">
+            <div className="space-y-8 bg-white p-8 sm:p-12 rounded-3xl border border-cream-border shadow-sm">
+              <div className="space-y-2 border-b border-cream-border pb-6">
+                <span className="text-xs font-bold uppercase tracking-wider text-amber-oak">
+                  Commercial Terms
+                </span>
+                <h1 className="text-3xl sm:text-4xl font-display font-extrabold text-charcoal">
+                  Terms of Supply
+                </h1>
+                <p className="text-xs text-charcoal-subtle">
+                  {siteConfig.name} • Office: {siteConfig.contact.address.full}
                 </p>
-              </section>
+              </div>
 
-              <section className="space-y-2">
-                <h2 className="font-display text-xl font-bold text-charcoal">
-                  2. Quality Standards & Verification
-                </h2>
-                <p>
-                  Products supplied under the BS 1088 marine specification conform to strict boiling-water-proof (WBP) phenol-formaldehyde adhesive requirements. Clients are entitled to verify batch lot numbers and mill test certificates prior to gate dispatch.
-                </p>
-              </section>
+              <div className="space-y-6 text-sm text-charcoal-light leading-relaxed">
+                <div className="space-y-2">
+                  <h2 className="text-lg font-display font-bold text-charcoal">1. Product Scope</h2>
+                  <p>
+                    {siteConfig.name} supplies Safarian boards (03mm, 06mm, 08mm, 12mm) and Plywood sheets (16mm and 18mm special product) subject to active manufacturing schedules in Central Ethiopia, Werabe City and order confirmation from our Addis Ababa office.
+                  </p>
+                </div>
 
-              <section className="space-y-2">
-                <h2 className="font-display text-xl font-bold text-charcoal">
-                  3. Jobsite Dispatch & Offloading
-                </h2>
-                <p>
-                  Delivery dates provided are estimated in good faith. The client is responsible for ensuring clear and unobstructed access for heavy flatbed commercial vehicles and coordinating crane or forklift equipment at the designated jobsite drop point.
-                </p>
-              </section>
+                <div className="space-y-2">
+                  <h2 className="text-lg font-display font-bold text-charcoal">2. Quote Requests &amp; Confirmations</h2>
+                  <p>
+                    Online inquiries and quote requests initiate direct communication with our sales team via telephone, WhatsApp, or email. Confirmed quantities, pickup arrangements, and delivery schedules are finalized directly with our Ayer Tena office.
+                  </p>
+                </div>
 
-              <section className="space-y-2">
-                <h2 className="font-display text-xl font-bold text-charcoal">
-                  4. Inspection & Claims
-                </h2>
-                <p>
-                  Consignments must be visually inspected upon offloading. Any claims regarding transit damage, sheet count discrepancy, or thickness variance must be lodged in writing with our logistics department within 48 hours of delivery.
-                </p>
-              </section>
+                <div className="space-y-2">
+                  <h2 className="text-lg font-display font-bold text-charcoal">3. Storage &amp; Handling Guidance</h2>
+                  <p>
+                    Customers are advised to store all Safarian and Plywood sheets horizontally on level supports in a dry, covered environment protected from direct moisture exposure prior to fabrication or installation.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <h2 className="text-lg font-display font-bold text-charcoal">4. Direct Contact</h2>
+                  <p>
+                    For supply questions, call {siteConfig.contact.phoneDisplay}, {siteConfig.contact.secondaryPhoneDisplay}, or {siteConfig.contact.tertiaryPhoneDisplay}.
+                  </p>
+                </div>
+              </div>
             </div>
           </Container>
         </Section>
@@ -73,4 +71,3 @@ export default function TermsPage() {
     </>
   );
 }
-

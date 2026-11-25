@@ -5,9 +5,9 @@ export interface ProductVariant {
   id: string;
   thickness: string;
   size: string;
-  price?: number;
   stock_status: StockStatus;
   stock_quantity: number;
+  is_special?: boolean;
 }
 
 export interface ProductSpecs {
@@ -38,7 +38,6 @@ export interface Product {
   status: ProductStatus;
   stock_status?: StockStatus;
   stock_quantity?: number;
-  price?: number;
   brand?: string;
   sku?: string;
   variants?: ProductVariant[];
@@ -88,8 +87,6 @@ export interface Quote {
   client_phone: string;
   product_requested: string;
   quantity: string;
-  amount?: number;
-  currency?: string;
   pdf_url?: string;
   status: QuoteStatus;
   notes?: string;
@@ -163,8 +160,12 @@ export interface SiteSettings {
   contact_email: string;
   sales_email: string;
   phone: string;
+  secondary_phone?: string;
+  tertiary_phone?: string;
   whatsapp: string;
+  telegram?: string;
   address: string;
+  factory_address?: string;
   business_hours: string;
   hero_title: string;
   hero_subtitle: string;
