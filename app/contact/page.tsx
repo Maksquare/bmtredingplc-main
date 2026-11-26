@@ -18,7 +18,7 @@ import { ContactForm } from "@/components/forms/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact Us",
-  description: `Contact ${siteConfig.name} at our Addis Ababa office (Ayer Tena, Shamo Tower, 3rd Floor) or Werabe City factory. Call 0911 247 821, 0911 221 261, or 0910 953 373.`,
+  description: `Contact ${siteConfig.name} at our Addis Ababa office (Ayer Tena, Shamo Tower, 3rd Floor) or ${siteConfig.contact.factory.full} factory. Call 0911 247 821, 0911 221 261, or 0910 953 373.`,
   alternates: {
     canonical: `${siteConfig.url}/contact`,
   },
@@ -107,7 +107,7 @@ export default function ContactPage() {
                         Factory Location
                       </span>
                       <h2 className="text-lg font-display font-bold text-charcoal">
-                        Central Ethiopia, Werabe City
+                        {siteConfig.contact.factory.full}
                       </h2>
                       <p className="text-sm text-charcoal-light">
                         Manufacturing facility producing Safarian boards and structural Plywood sheets.

@@ -39,7 +39,7 @@ const milestones = [
   {
     step: "02",
     title: "Werabe Manufacturing Facility",
-    desc: "Established production operations in Central Ethiopia, Werabe City, creating a reliable domestic manufacturing base for consistent Safarian and Plywood sheet output.",
+    desc: "Established production operations in Central Ethiopia, Silte Zone/ስልጤ ዞን, Werabe City, creating a reliable domestic manufacturing base for consistent Safarian and Plywood sheet output.",
   },
   {
     step: "03",
@@ -62,7 +62,7 @@ const values = [
   {
     icon: Factory,
     title: "Werabe Factory Production",
-    desc: "Manufacturing in Werabe City, Central Ethiopia allows close oversight of sheet pressing, thickness uniformity, and dependable bulk volume allocation for recurring commercial partners.",
+    desc: "Manufacturing in Central Ethiopia, Silte Zone/ስልጤ ዞን, Werabe City allows close oversight of sheet pressing, thickness uniformity, and dependable bulk volume allocation for recurring commercial partners.",
   },
   {
     icon: MapPin,
@@ -90,7 +90,7 @@ export default function AboutPage() {
                 Reliable Safarian &amp; Plywood Supply Built Over 10+ Years.
               </h1>
               <p className="text-base sm:text-lg text-cream/80 leading-relaxed max-w-2xl">
-                {siteConfig.name} combines manufacturing operations in Central Ethiopia, Werabe City with commercial coordination in Addis Ababa (Ayer Tena, Shamo Tower, 3rd Floor) — serving 200+ furniture workshops, contractors, and enterprises nationwide.
+                {siteConfig.name} combines manufacturing operations in {siteConfig.contact.factory.full} with commercial coordination in Addis Ababa (Ayer Tena, Shamo Tower, 3rd Floor) — serving 200+ furniture workshops, contractors, and enterprises nationwide.
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
                 <Button href="/products" variant="amber" rightIcon={<ArrowRight className="w-4 h-4" />}>
@@ -160,10 +160,10 @@ export default function AboutPage() {
                   How We Operate
                 </span>
                 <h2 className="text-3xl sm:text-4xl font-display font-extrabold text-charcoal tracking-tight">
-                  From Central Ethiopia Manufacturing to Addis Ababa Fulfillment
+                  From Silte Zone Manufacturing to Addis Ababa Fulfillment
                 </h2>
                 <p className="text-sm sm:text-base text-charcoal-light leading-relaxed">
-                  Furniture makers and major construction groups depend on sheet boards that arrive flat, cleanly cut, and true to thickness across every order. At {siteConfig.name}, our production in Werabe City keeps bulk availability strong across our entire product range.
+                  Furniture makers and major construction groups depend on sheet boards that arrive flat, cleanly cut, and true to thickness across every order. At {siteConfig.name}, our production in {siteConfig.contact.factory.full} keeps bulk availability strong across our entire product range.
                 </p>
                 <div className="space-y-3 pt-2">
                   {[

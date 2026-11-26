@@ -38,7 +38,7 @@ export default function TermsPage() {
                 <div className="space-y-2">
                   <h2 className="text-lg font-display font-bold text-charcoal">1. Product Scope</h2>
                   <p>
-                    {siteConfig.name} supplies Safarian boards (03mm, 06mm, 08mm, 12mm) and Plywood sheets (16mm and 18mm special product) subject to active manufacturing schedules in Central Ethiopia, Werabe City and order confirmation from our Addis Ababa office.
+                    {siteConfig.name} supplies Safarian boards (03mm, 06mm, 08mm, 12mm) and Plywood sheets (16mm and 18mm special product) subject to active manufacturing schedules in {siteConfig.contact.factory.full} and order confirmation from our Addis Ababa office.
                   </p>
                 </div>
 

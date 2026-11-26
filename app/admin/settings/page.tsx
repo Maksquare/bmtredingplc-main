@@ -224,7 +224,7 @@ export default function SettingsAdminPage() {
                 <input
                   type="text"
                   name="factory_address"
-                  value={formData.factory_address || "Central Ethiopia, Werabe City"}
+                  value={formData.factory_address || "Central Ethiopia, Silte Zone/ስልጤ ዞን, Werabe City"}
                   onChange={handleChange}
                   className="w-full pl-9 pr-4 py-2 border border-neutral-200 rounded-lg text-sm bg-neutral-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C8832A]/20 focus:border-[#C8832A]"
                 />
@@ -256,7 +256,7 @@ export default function SettingsAdminPage() {
                 <input
                   type="text"
                   readOnly
-                  value="Addis Ababa Office (Ayer Tena) & Werabe City Factory"
+                  value="Addis Ababa Office (Ayer Tena) & Silte Zone/ስልጤ ዞን, Werabe City Factory"
                   className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm bg-neutral-100 text-neutral-600 cursor-not-allowed"
                 />
               </div>

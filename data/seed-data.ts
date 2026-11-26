@@ -44,7 +44,7 @@ export const products: Product[] = [
     short_description:
       "Precision commercial board engineered in four calibrated thicknesses — 03mm, 06mm, 08mm, and 12mm — for Ethiopian furniture makers and interior joinery.",
     description:
-      "Manufactured at our Central Ethiopia factory in Werabe City, bmtradingplc Safarian sheets provide uniform surface flatness, clean cutting behavior, and dependable dimensional stability across four dedicated gauges: 03mm, 06mm, 08mm, and 12mm. Widely chosen by leading furniture workshops and commercial interior contractors for cabinetry backs, drawer bases, partitions, and structural joinery.",
+      "Manufactured at our facility in Central Ethiopia, Silte Zone/ስልጤ ዞን, Werabe City, bmtradingplc Safarian sheets provide uniform surface flatness, clean cutting behavior, and dependable dimensional stability across four dedicated gauges: 03mm, 06mm, 08mm, and 12mm. Widely chosen by leading furniture workshops and commercial interior contractors for cabinetry backs, drawer bases, partitions, and structural joinery.",
     category_id: "cat-1",
     category_name: "Safarian",
     images: [
@@ -59,7 +59,7 @@ export const products: Product[] = [
       core_species: "Selected Seasoned Plantation Hardwood",
       surface_finish: "Smooth Factory-Sanded Face",
       moisture_content: "8% – 12%",
-      origin: "Central Ethiopia (Werabe City Factory)",
+      origin: "Central Ethiopia, Silte Zone/ስልጤ ዞን, Werabe City",
     },
     applications: [
       "03mm & 06mm: Wardrobe backs, drawer bottoms, and lightweight wall linings",
@@ -128,7 +128,7 @@ export const products: Product[] = [
       core_species: "Cross-Laminated Dense Hardwood Veneers",
       surface_finish: "Calibrated Smooth Face (18mm Special Edition)",
       moisture_content: "8% – 12%",
-      origin: "Central Ethiopia (Werabe City Factory)",
+      origin: "Central Ethiopia, Silte Zone/ስልጤ ዞን, Werabe City",
     },
     applications: [
       "18mm Special Product: Flagship heavy-duty wardrobe doors, office desks & structural slabs",

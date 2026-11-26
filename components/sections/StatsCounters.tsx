@@ -135,7 +135,7 @@ export function StatsCounters() {
                 10+ Years &amp; 100% Quality
               </h3>
               <p className="text-xs sm:text-sm text-[#3D4A43] leading-relaxed">
-                Over a decade manufacturing and inspecting consistent 100% graded sheets from Central Ethiopia, Werabe City.
+                Over a decade manufacturing and inspecting consistent 100% graded sheets from {siteConfig.contact.factory.full}.
               </p>
             </div>
 

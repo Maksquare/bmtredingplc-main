@@ -208,14 +208,14 @@ interface AdminContextType {
 const AdminContext = createContext<AdminContextType | null>(null);
 
 const STORAGE_KEYS = {
-  PRODUCTS: "bmt_admin_products_v3",
+  PRODUCTS: "bmt_admin_products_v4",
   CATEGORIES: "bmt_admin_categories_v3",
   QUOTES: "bmt_admin_quotes_v2",
   INQUIRIES: "bmt_admin_inquiries_v2",
   PARTNERS: "bmt_admin_partners_v3",
   TESTIMONIALS: "bmt_admin_testimonials_v3",
   MEDIA: "bmt_admin_media_v3",
-  SETTINGS: "bmt_admin_settings_v2",
+  SETTINGS: "bmt_admin_settings_v3",
   CUSTOMERS: "bmt_admin_customers_v2",
   ADJUSTMENTS: "bmt_admin_adjustments_v2",
   ROLE: "bmt_admin_role_v2",

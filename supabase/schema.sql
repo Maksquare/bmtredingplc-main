@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
     whatsapp TEXT DEFAULT '+251911247821',
     telegram TEXT DEFAULT '+251911247821',
     street_address TEXT DEFAULT 'Addis Ababa, Ayer Tena, Shamo Tower, 3rd Floor',
-    factory_address TEXT DEFAULT 'Central Ethiopia, Werabe City',
+    factory_address TEXT DEFAULT 'Central Ethiopia, Silte Zone/ስልጤ ዞን, Werabe City',
     city TEXT DEFAULT 'Addis Ababa',
     region TEXT DEFAULT 'Addis Ababa',
     country TEXT DEFAULT 'Ethiopia',

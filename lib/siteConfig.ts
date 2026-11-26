@@ -37,9 +37,9 @@ export const siteConfig = {
     },
     factory: {
       city: "Werabe City",
-      region: "Central Ethiopia",
+      region: "Central Ethiopia, Silte Zone/ስልጤ ዞን",
       country: "Ethiopia",
-      full: "Central Ethiopia, Werabe City",
+      full: "Central Ethiopia, Silte Zone/ስልጤ ዞን, Werabe City",
     },
     hours: "Monday – Saturday: 08:30 – 17:30 (EAT)",
   },

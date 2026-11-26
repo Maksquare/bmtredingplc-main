@@ -51,7 +51,7 @@ async function runSeed() {
       name: 'Safarian',
       slug: 'safarian',
       short_description: 'Precision commercial board engineered in four calibrated thicknesses — 03mm, 06mm, 08mm, and 12mm.',
-      description: 'Manufactured at our Central Ethiopia factory in Werabe City, bmtradingplc Safarian sheets provide uniform flatness and clean cutting across 03mm, 06mm, 08mm, and 12mm thicknesses.',
+      description: 'Manufactured at our facility in Central Ethiopia, Silte Zone/ስልጤ ዞን, Werabe City, bmtradingplc Safarian sheets provide uniform flatness and clean cutting across 03mm, 06mm, 08mm, and 12mm thicknesses.',
       category_id: 'cat-1',
       images: [
         '/images/products/safarian-main.jpg',
@@ -64,7 +64,7 @@ async function runSeed() {
         glue_type: 'Moisture-Resistant Interior & Structural Bond',
         core_species: 'Selected Seasoned Plantation Hardwood',
         surface_finish: 'Smooth Factory-Sanded Face',
-        origin: 'Central Ethiopia (Werabe City Factory)',
+        origin: 'Central Ethiopia, Silte Zone/ስልጤ ዞን, Werabe City',
       },
       applications: [
         '03mm & 06mm: Wardrobe backs, drawer bottoms, and lightweight linings',
@@ -93,7 +93,7 @@ async function runSeed() {
         glue_type: 'High-Bond Structural Adhesive',
         core_species: 'Cross-Laminated Dense Hardwood Veneers',
         surface_finish: 'Calibrated Smooth Face (18mm Special Edition)',
-        origin: 'Central Ethiopia (Werabe City Factory)',
+        origin: 'Central Ethiopia, Silte Zone/ስልጤ ዞን, Werabe City',
       },
       applications: [
         '18mm Special Product: Heavy wardrobe doors, executive desks & structural framing',

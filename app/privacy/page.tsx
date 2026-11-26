@@ -45,7 +45,7 @@ export default function PrivacyPage() {
                 <div className="space-y-2">
                   <h2 className="text-lg font-display font-bold text-charcoal">2. How We Use Information</h2>
                   <p>
-                    Submitted details are used solely to respond to your inquiry, confirm sheet availability across Safarian (03mm, 06mm, 08mm, 12mm) and Plywood (16mm and 18mm special product), and coordinate supply from our Werabe City factory or Addis Ababa office. We do not sell or rent client contact records to third parties.
+                    Submitted details are used solely to respond to your inquiry, confirm sheet availability across Safarian (03mm, 06mm, 08mm, 12mm) and Plywood (16mm and 18mm special product), and coordinate supply from our {siteConfig.contact.factory.full} factory or Addis Ababa office. We do not sell or rent client contact records to third parties.
                   </p>
                 </div>
 
